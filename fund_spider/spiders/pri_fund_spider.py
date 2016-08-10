@@ -44,7 +44,7 @@ class PriFundSpiderSpider(CrawlSpider):
             item = FundSpiderItem()
             item['fund_id'] = ''
             item['fund_name'] = tds[1].text.strip()
-            item['fund_full_name'] = ''
+            item['fund_full_name'] = "中信信托." + item['fund_name'] + "证券投资集合资金信托"
             item['open_date'] = tds[2].text.strip()
             item['nav'] = tds[3].text.strip()
             item['added_nav'] = tds[4].text.strip()
