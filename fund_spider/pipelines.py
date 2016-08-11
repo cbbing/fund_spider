@@ -13,7 +13,7 @@ from scrapy.exceptions import DropItem
 from items import FundSpiderItem
 
 engine = create_engine('mysql+mysqldb://licj_read:AAaa1234@.mysql.rds.aliyuncs.com:3306/classifier_db' , connect_args={'charset': 'utf8'})
-redis_db4 = redis.Redis(host="123.56..", port=6379, db=4, password="AAaa5678")
+redis_db4 = redis.Redis(host="123..124", port=6379, db=4, password="AAaa5678")
 redis_fund_dict = "fund_ids"
 
 class DuplicatePipeline(object):
@@ -31,11 +31,10 @@ class DuplicatePipeline(object):
     def process_item(self, item, spider):
 
         if type(item) is FundSpiderItem:
-            if redis_db4.hexist(redis_fund_dict, item['uuid']):
+            print redis_db4.keys()
+            if redis_db4.hexists(redis_fund_dict, item['uuid']):
                 raise DropItem("Duplicate item found:%s" % item)
-            else:
-                redis_db4.hset(redis_fund_dict, item['uuid'], 0)
-                return item
+
 
 
         return item
@@ -49,10 +48,10 @@ class MySQLStorePipeline(object):
 
         # self.fund_items.setdefault(spider.name, [])
         # self.fund_items[spider.name].append(item)
-        df = pd.DataFrame(item)
+        df = pd.DataFrame([item])
         print df
         df.to_sql('fund_nav', engine, if_exists='append', index=False)
-
+        redis_db4.hset(redis_fund_dict, item['uuid'], 0)
 
         return item
 

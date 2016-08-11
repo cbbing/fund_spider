@@ -10,6 +10,7 @@ import scrapy
 
 class FundSpiderItem(scrapy.Item):
     # define the fields for your item here like:
+    uuid = scrapy.Field()
     fund_id = scrapy.Field()
     fund_name = scrapy.Field()
     fund_full_name = scrapy.Field()

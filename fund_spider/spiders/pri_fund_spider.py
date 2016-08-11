@@ -10,6 +10,7 @@ from scrapy.linkextractors import LinkExtractor
 
 from bs4 import BeautifulSoup as bs
 import re
+import hashlib
 
 from fund_spider.items import FundSpiderItem
 from util.codeConvert import GetNowTime
@@ -32,7 +33,7 @@ class PriFundSpiderSpider(CrawlSpider):
         :param response:
         :return:
         """
-        print "content news:%s" % response.url
+        print "parse url:%s" % response.url
 
         soup = bs(response.body, 'lxml')
         trs = soup.find_all('tr')
@@ -55,7 +56,10 @@ class PriFundSpiderSpider(CrawlSpider):
             item['source_code'] = 1
             item['source'] = 'http://trust.ecitic.com/XXPL_JZPL/index.jsp?type=1'
             item['org_id'] = 'TG0001'
+
+            item['uuid'] = hashlib.md5(item['fund_name'].encode('utf8')).hexdigest()
             print item
+            yield item
 
 
 
