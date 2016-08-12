@@ -24,5 +24,5 @@ class FundSpiderItem(scrapy.Item):
     source = scrapy.Field()
     org_id = scrapy.Field()
 
-    def __unicode__(self):
-        return self.fund_name+","+self.foundation_date
+    # def __unicode__(self):
+    #     return self.fund_name+","+self.foundation_date

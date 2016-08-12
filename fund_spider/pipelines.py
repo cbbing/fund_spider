@@ -11,9 +11,10 @@ from sqlalchemy import create_engine
 
 from scrapy.exceptions import DropItem
 from items import FundSpiderItem
+import fund_spider.settings as settings
 
-engine = create_engine('mysql+mysqldb://licj_read:AAaa1234@.mysql.rds.aliyuncs.com:3306/classifier_db' , connect_args={'charset': 'utf8'})
-redis_db4 = redis.Redis(host="123..124", port=6379, db=4, password="AAaa5678")
+engine = create_engine('mysql+mysqldb://{}:{}@{}:3306/{}'.format(settings.MYSQL_USER, settings.MYSQL_PASSWD, settings.MYSQL_HOST, settings.MYSQL_DBNAME) , connect_args={'charset': 'utf8'})
+redis_db4 = redis.Redis(host=settings.REDIS_HOST, port=6379, db=4, password=settings.REDIS_PWD)
 redis_fund_dict = "fund_ids"
 
 class DuplicatePipeline(object):
@@ -31,7 +32,7 @@ class DuplicatePipeline(object):
     def process_item(self, item, spider):
 
         if type(item) is FundSpiderItem:
-            print redis_db4.keys()
+
             if redis_db4.hexists(redis_fund_dict, item['uuid']):
                 raise DropItem("Duplicate item found:%s" % item)
 

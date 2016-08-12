@@ -15,6 +15,7 @@ SPIDER_MODULES = ['fund_spider.spiders']
 NEWSPIDER_MODULE = 'fund_spider.spiders'
 
 
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'fund_spider (+http://www.yourdomain.com)'
 
