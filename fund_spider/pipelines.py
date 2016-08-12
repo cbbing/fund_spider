@@ -36,8 +36,6 @@ class DuplicatePipeline(object):
             if redis_db4.hexists(redis_fund_dict, item['uuid']):
                 raise DropItem("Duplicate item found:%s" % item)
 
-
-
         return item
 
 class MySQLStorePipeline(object):
