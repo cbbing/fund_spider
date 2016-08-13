@@ -8,8 +8,6 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 import scrapy
-from scrapy.spider import CrawlSpider, Rule
-from scrapy.linkextractors import LinkExtractor
 
 from bs4 import BeautifulSoup as bs
 import re

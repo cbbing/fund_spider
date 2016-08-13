@@ -118,7 +118,7 @@ class TrustHuabaoSpider(scrapy.Spider):
         # 产品历史净值
         href_history = "http://www.huabaotrust.com/mouyichanpinlishi.jsp?product_id={fund_id}&prod_period_no=0001". \
             format(fund_id=item['fund_id'])
-        # yield scrapy.Request(href_history, callback=lambda response, itemTop=item: self.parse_history_link(response, itemTop))
+        yield scrapy.Request(href_history, callback=lambda response, itemTop=item: self.parse_history_link(response, itemTop))
 
     def parse_history_link(self, response, itemTop):
         """
@@ -138,13 +138,12 @@ class TrustHuabaoSpider(scrapy.Spider):
         if pageFind:
             page_count = int(pageFind.group(1))
 
-            url = "http://www.huabaotrust.com/index111.jsp"
             for i in range(2, page_count + 1):
                 formdata = {"show": "0",
                             "pageIndex": str(i),
                             "totalSize": "100",
                             }
-                yield FormRequest(url, callback=lambda response, itemTop=itemTop: self.parse_history_nav(response, itemTop), formdata=formdata)
+                yield FormRequest(response.url, callback=lambda response, itemTop=itemTop: self.parse_history_nav(response, itemTop), formdata=formdata)
 
     def parse_history_nav(self, response, itemTop):
         """
@@ -158,7 +157,7 @@ class TrustHuabaoSpider(scrapy.Spider):
         soup = bs(response.body, 'lxml')
         trs = soup.find_all('tr')
         for tr in trs:
-            tds = tr.find_all('li')
+            tds = tr.find_all('td')
             if len(tds) != 4 or tds[0].text == '产品ID':
                 continue
 
@@ -174,7 +173,7 @@ class TrustHuabaoSpider(scrapy.Spider):
             item['org_id'] = itemTop['org_id']
 
             item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
-            print item
+            print item['fund_name'],item['statistic_date']
             yield item
 
 
