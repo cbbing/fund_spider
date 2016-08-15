@@ -68,7 +68,7 @@ class TrustEciticSpider(scrapy.Spider):
 
             item['entry_time'] = GetNowTime()
             item['source_code'] = 1
-            item['source'] = 'http://trust.ecitic.com/XXPL_JZPL/index.jsp?type=1'
+            item['source'] = response.url
             item['org_id'] = 'TG0001'
 
 
@@ -109,7 +109,7 @@ class TrustEciticSpider(scrapy.Spider):
 
             item['entry_time'] = GetNowTime()
             item['source_code'] = itemTop['source_code']
-            item['source'] = itemTop['source']
+            item['source'] = response.url
             item['org_id'] = itemTop['org_id']
 
             item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()

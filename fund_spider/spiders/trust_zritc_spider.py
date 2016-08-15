@@ -40,7 +40,7 @@ class TrustZritcSpider(scrapy.Spider):
 
             item['entry_time'] = GetNowTime()
             item['source_code'] = 1
-            item['source'] = 'http://www.zritc.com/InformationDisclosure/Index'
+            item['source'] = response.url
             item['org_id'] = 'TG0003'
 
             item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()

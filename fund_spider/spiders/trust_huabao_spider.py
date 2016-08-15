@@ -85,7 +85,7 @@ class TrustHuabaoSpider(scrapy.Spider):
 
             item['entry_time'] = GetNowTime()
             item['source_code'] = 1
-            item['source'] = 'http://www.huabaotrust.com/index111.jsp'
+            item['source'] = response.url
             item['org_id'] = 'TG0002'
 
 
@@ -169,7 +169,7 @@ class TrustHuabaoSpider(scrapy.Spider):
 
             item['entry_time'] = GetNowTime()
             item['source_code'] = itemTop['source_code']
-            item['source'] = itemTop['source']
+            item['source'] = response.url
             item['org_id'] = itemTop['org_id']
 
             item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
