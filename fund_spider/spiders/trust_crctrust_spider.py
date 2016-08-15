@@ -56,7 +56,8 @@ class TrustCrctrustSpider(scrapy.Spider):
                     "order": "sxrq",
                     "sort": "asc"
                     }
-        yield FormRequest(response.url, callback=self.parse_item, formdata=formdata)
+        yield FormRequest(response.url, formdata=formdata, callback=self.parse_item, dont_filter=True)
+
 
         # 请求其它页
         encodejson = json.loads(response.body, encoding='utf8')
@@ -71,7 +72,7 @@ class TrustCrctrustSpider(scrapy.Spider):
                         "order": "sxrq",
                         "sort": "asc"
                         }
-            yield FormRequest(url, callback=self.parse_item, formdata=formdata)
+            yield FormRequest(url, callback=self.parse_item, formdata=formdata, dont_filter=True)
 
 
     def parse_item(self, response):
@@ -116,7 +117,8 @@ class TrustCrctrustSpider(scrapy.Spider):
                         "order_by": "1",
                         }
             yield FormRequest(response.url, callback=lambda response, item=item : self.parse_history_link(response, item),
-                              formdata=formdata)
+                              formdata=formdata, dont_filter=True)
+
 
 
     def parse_history_link(self, response, item):
@@ -132,8 +134,9 @@ class TrustCrctrustSpider(scrapy.Spider):
                    "endTime": "",
                    "order_by": "1",
                    }
-        yield FormRequest(response.url, callback=lambda response, item=item : self.parse_history_nav(response, item),
-                          formdata=formdata)
+        yield FormRequest(response.url, callback=lambda response, itemTop=item : self.parse_history_nav(response, itemTop),
+                          formdata=formdata, dont_filter=True)
+
 
         # 请求其它页
         encodejson = json.loads(response.body, encoding='utf8')
@@ -147,8 +150,8 @@ class TrustCrctrustSpider(scrapy.Spider):
                         "order": "sxrq",
                         "sort": "asc"
                         }
-            yield FormRequest(response.url, callback=lambda response, item=item : self.parse_history_nav(response, item),
-                              formdata=formdata)
+            yield FormRequest(response.url, callback=lambda response, itemTop=item : self.parse_history_nav(response, itemTop),
+                              formdata=formdata, dont_filter=True)
 
 
     def parse_history_nav(self, response, itemTop):
