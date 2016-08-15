@@ -57,6 +57,8 @@ class TrustSiticSpider(scrapy.Spider):
 
     def parse_item(self, response):
         self.log(response.url)
+        # print response.url
+        # return
 
         soup = bs(response.body, 'lxml')
 
@@ -78,15 +80,15 @@ class TrustSiticSpider(scrapy.Spider):
 
             # 获取产品ID
             href = tds[1].find('a')['href'] #/products/search/index.html#/sdtrust-web/project/detail!detail?projectCode=SD0ODD&isFund=1
-            findProdID = re.search("projectCode=(\w+)\&", href)
+            findProdID = re.search("fundcode=(\w+)", href)
             if findProdID:
                 item['fund_id'] = findProdID.group(1)
                 print item['fund_id']
 
             item['entry_time'] = GetNowTime()
             item['source_code'] = 1
-            item['source'] = 'http://www.huabaotrust.com/index111.jsp'
-            item['org_id'] = 'TG0002'
+            item['source'] = response.url
+            item['org_id'] = 'TG0004'
 
 
 
@@ -97,8 +99,6 @@ class TrustSiticSpider(scrapy.Spider):
             # 产品详情
             href = "http://www.sitic.com.cn/chart-web/chart/trustnettable?ffshow=&fundcode={}&from=&to=&pages=1-10".format(item['fund_id'])
             yield scrapy.Request(href, callback=lambda response, item=item : self.parse_history_link(response, item))
-
-            #http://www.sitic.com.cn/chart-web/chart/trustnettable?ffshow=&fundcode=SD0ODD&from=&to=&pages=4-10
 
 
     def parse_history_link(self, response, item):
@@ -131,18 +131,19 @@ class TrustSiticSpider(scrapy.Spider):
         trs = soup.find_all('tr')
         for tr in trs:
             tds = tr.find_all('td')
-            if len(tds) != 4 or tds[0].text == '产品ID':
+            if len(tds) != 3 or tds[0].text == '日期':
                 continue
 
             item = FundSpiderItem()
             item['fund_id'] = itemTop['fund_id']
             item['fund_name'] = itemTop['fund_name']
-            item['nav'] = tds[2].text.strip()
-            item['statistic_date'] = tds[3].text.strip()
+            item['nav'] = tds[1].text.strip()
+            item['added_nav'] = tds[2].text.strip()
+            item['statistic_date'] = tds[0].text.strip()
 
             item['entry_time'] = GetNowTime()
             item['source_code'] = itemTop['source_code']
-            item['source'] = itemTop['source']
+            item['source'] = response.url
             item['org_id'] = itemTop['org_id']
 
             item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
