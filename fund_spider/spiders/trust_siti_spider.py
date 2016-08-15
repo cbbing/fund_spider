@@ -46,7 +46,7 @@ class TrustSitiSpider(scrapy.Spider):
             item['org_id'] = 'TG0005'
 
             item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
-            print item['uuid'], item['fund_name'], item['statistic_date']
+            # print item['uuid'], item['fund_name'], item['statistic_date']
             yield item
 
             # 历史净值
@@ -102,5 +102,5 @@ class TrustSitiSpider(scrapy.Spider):
             item['org_id'] = itemTop['org_id']
 
             item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
-            print item['fund_name'], item['statistic_date']
+            # print item['fund_name'], item['statistic_date']
             yield item
