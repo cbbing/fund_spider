@@ -56,7 +56,7 @@ class TrustHuabaoSpider(scrapy.Spider):
                             "pageIndex": str(i),
                             "totalSize": "77",
                             }
-                yield FormRequest(url, callback=self.parse_item, formdata=formdata)
+                yield FormRequest(url, callback=self.parse_item, formdata=formdata, dont_filter=True)
 
 
     def parse_item(self, response):
@@ -131,7 +131,7 @@ class TrustHuabaoSpider(scrapy.Spider):
         self.log(response.url)
 
         # 第一页
-        yield scrapy.Request(response.url, callback=lambda response, itemTop=itemTop: self.parse_history_nav(response, itemTop))
+        yield scrapy.Request(response.url, callback=lambda response, itemTop=itemTop: self.parse_history_nav(response, itemTop), dont_filter=True)
 
         # 请求其它页
         pageFind = re.search("共\s*(\d+)\s*页", response.body)  # 获取页数
@@ -143,7 +143,7 @@ class TrustHuabaoSpider(scrapy.Spider):
                             "pageIndex": str(i),
                             "totalSize": "100",
                             }
-                yield FormRequest(response.url, callback=lambda response, itemTop=itemTop: self.parse_history_nav(response, itemTop), formdata=formdata)
+                yield FormRequest(response.url, callback=lambda response, itemTop=itemTop: self.parse_history_nav(response, itemTop), formdata=formdata, dont_filter=True)
 
     def parse_history_nav(self, response, itemTop):
         """
