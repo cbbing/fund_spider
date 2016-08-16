@@ -18,7 +18,7 @@ engine = create_engine('mysql+mysqldb://{}:{}@{}:3306/{}'.format(settings.MYSQL_
                        connect_args={'charset': 'utf8'},
                        pool_size=8)
 redis_db4 = redis.Redis(host=settings.REDIS_HOST, port=6379, db=4, password=settings.REDIS_PWD)
-redis_fund_dict = "fund_ids"
+redis_fund_dict = "fund_uuids"
 
 class DuplicatePipeline(object):
     """
@@ -31,12 +31,6 @@ class DuplicatePipeline(object):
             df = pd.read_sql(sql, engine)
             for uuid in df['uuid'].get_values():
                 redis_db4.hset(redis_fund_dict, uuid, 0)
-
-        #df = pd.read_sql('select uuid from article_guba_easymoney', engine)
-        #self.uuids_seen = set(df['uuid'].get_values())
-        # self.uuids_seen = []
-        pass
-
 
     def process_item(self, item, spider):
 
@@ -51,6 +45,9 @@ class SetFundIDPipeline(object):
     设置fund_id字段
     """
     def process_item(self, item, spider):
+
+        return item
+
         table = "classifier_db.t_fund_nv_data"
         sql = "select distinct fund_id from {} where fund_name='{}' ".format(table, item['fund_name'])
         df = pd.read_sql(sql, engine)
