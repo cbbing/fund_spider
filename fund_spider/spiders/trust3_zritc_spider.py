@@ -18,7 +18,7 @@ from util.codeConvert import GetNowTime
 
 
 class TrustZritcSpider(scrapy.Spider):
-    name = "trust_zritc_spider"
+    name = "trust3_zritc_spider"
     allowed_domains = ["zritc.com"]
     start_urls = ["http://www.zritc.com/InformationDisclosure/Index?pageIndex={}".format(i) for i in range(1, 17241)]
 

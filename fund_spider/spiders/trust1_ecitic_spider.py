@@ -18,7 +18,7 @@ from util.codeConvert import GetNowTime
 
 
 class TrustEciticSpider(scrapy.Spider):
-    name = "trust_ecitic_spider"
+    name = "trust1_ecitic_spider"
     # allowed_domains = ["trust.ecitic.com"]
     start_urls = (
         'http://trust.ecitic.com/XXPL_JZPL/index.jsp?type=1',

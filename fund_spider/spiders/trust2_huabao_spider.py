@@ -19,7 +19,7 @@ from util.codeConvert import GetNowTime
 
 
 class TrustHuabaoSpider(scrapy.Spider):
-    name = "trust_huabao_spider"
+    name = "trust2_huabao_spider"
     allowed_domains = ["huabaotrust.com"]
 
     start_urls = (
