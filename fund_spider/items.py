@@ -11,7 +11,8 @@ import scrapy
 class FundSpiderItem(scrapy.Item):
     # define the fields for your item here like:
     uuid = scrapy.Field()
-    fund_id = scrapy.Field()
+    fund_id = scrapy.Field()  #自己添加
+    fund_code = scrapy.Field() #平台自带
     fund_name = scrapy.Field()
     fund_full_name = scrapy.Field()
     open_date = scrapy.Field()

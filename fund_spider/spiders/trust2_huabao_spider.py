@@ -74,7 +74,7 @@ class TrustHuabaoSpider(scrapy.Spider):
                 continue
 
             item = FundSpiderItem()
-            item['fund_id'] = tds[0].text.strip()
+            item['fund_code'] = tds[0].text.strip()
             item['fund_name'] = tds[1].text.strip()
             # item['fund_full_name'] = ''
             # item['open_date'] = tds[2].text.strip()
@@ -116,8 +116,8 @@ class TrustHuabaoSpider(scrapy.Spider):
         yield item
 
         # 产品历史净值
-        href_history = "http://www.huabaotrust.com/mouyichanpinlishi.jsp?product_id={fund_id}&prod_period_no=0001". \
-            format(fund_id=item['fund_id'])
+        href_history = "http://www.huabaotrust.com/mouyichanpinlishi.jsp?product_id={fund_code}&prod_period_no=0001". \
+            format(fund_code=item['fund_code'])
         yield scrapy.Request(href_history, callback=lambda response, itemTop=item: self.parse_history_link(response, itemTop))
 
     def parse_history_link(self, response, itemTop):
@@ -162,7 +162,7 @@ class TrustHuabaoSpider(scrapy.Spider):
                 continue
 
             item = FundSpiderItem()
-            item['fund_id'] = itemTop['fund_id']
+            item['fund_code'] = itemTop['fund_code']
             item['fund_name'] = itemTop['fund_name']
             item['nav'] = tds[2].text.strip()
             item['statistic_date'] = tds[3].text.strip()

@@ -82,8 +82,8 @@ class TrustSiticSpider(scrapy.Spider):
             href = tds[1].find('a')['href'] #/products/search/index.html#/sdtrust-web/project/detail!detail?projectCode=SD0ODD&isFund=1
             findProdID = re.search("fundcode=(\w+)", href)
             if findProdID:
-                item['fund_id'] = findProdID.group(1)
-                print item['fund_id']
+                item['fund_code'] = findProdID.group(1)
+                print item['fund_code']
 
             item['entry_time'] = GetNowTime()
             item['source_code'] = 1
@@ -97,7 +97,7 @@ class TrustSiticSpider(scrapy.Spider):
             # yield item
 
             # 产品详情
-            href = "http://www.sitic.com.cn/chart-web/chart/trustnettable?ffshow=&fundcode={}&from=&to=&pages=1-10".format(item['fund_id'])
+            href = "http://www.sitic.com.cn/chart-web/chart/trustnettable?ffshow=&fundcode={}&from=&to=&pages=1-10".format(item['fund_code'])
             yield scrapy.Request(href, callback=lambda response, item=item : self.parse_history_link(response, item))
 
 
@@ -114,7 +114,7 @@ class TrustSiticSpider(scrapy.Spider):
 
             for i in range(2, page_count + 1):
                 url = "http://www.sitic.com.cn/chart-web/chart/trustnettable?ffshow=&fundcode={}&from=&to=&pages={}-10".format(
-                    item['fund_id'],i)
+                    item['fund_code'],i)
                 yield scrapy.Request(url, callback=lambda response, item=item : self.parse_history_nav(response, item))
 
 
@@ -135,7 +135,7 @@ class TrustSiticSpider(scrapy.Spider):
                 continue
 
             item = FundSpiderItem()
-            item['fund_id'] = itemTop['fund_id']
+            item['fund_code'] = itemTop['fund_code']
             item['fund_name'] = itemTop['fund_name']
             item['nav'] = tds[1].text.strip()
             item['added_nav'] = tds[2].text.strip()

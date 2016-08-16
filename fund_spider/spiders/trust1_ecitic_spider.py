@@ -57,7 +57,7 @@ class TrustEciticSpider(scrapy.Spider):
                 continue
 
             item = FundSpiderItem()
-            # item['fund_id'] = ''
+            # item['fund_code'] = ''
             item['fund_name'] = tds[1].text.strip()
             item['fund_full_name'] = "中信信托." + item['fund_name'] + "证券投资集合资金信托"
             item['open_date'] = tds[2].text.strip()
@@ -98,7 +98,7 @@ class TrustEciticSpider(scrapy.Spider):
                 continue
 
             item = FundSpiderItem()
-            # item['fund_id'] = ''
+            # item['fund_code'] = ''
             item['fund_name'] = itemTop['fund_name']
             item['fund_full_name'] = "中信信托." + item['fund_name'] + "证券投资集合资金信托"
             item['open_date'] = itemTop['open_date']

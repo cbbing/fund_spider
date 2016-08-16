@@ -88,7 +88,7 @@ class TrustSitiSpider(scrapy.Spider):
                 continue
 
             item = FundSpiderItem()
-            # item['fund_id'] = itemTop['fund_id']
+            # item['fund_code'] = itemTop['fund_code']
             item['fund_name'] = itemTop['fund_name']
             item['open_date'] = itemTop['open_date']
             item['nav'] = tds[2].text.strip()
