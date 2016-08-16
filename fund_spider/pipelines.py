@@ -26,6 +26,12 @@ class DuplicatePipeline(object):
     """
 
     def __init__(self):
+        if redis_db4.hlen(redis_fund_dict) == 0:
+            sql = "SELECT uuid FROM classifier_db.t_fund_nv_data"
+            df = pd.read_sql(sql, engine)
+            for uuid in df['uuid'].get_values():
+                redis_db4.hset(redis_fund_dict, uuid, 0)
+
         #df = pd.read_sql('select uuid from article_guba_easymoney', engine)
         #self.uuids_seen = set(df['uuid'].get_values())
         # self.uuids_seen = []
@@ -35,7 +41,6 @@ class DuplicatePipeline(object):
     def process_item(self, item, spider):
 
         if type(item) is FundSpiderItem:
-
             if redis_db4.hexists(redis_fund_dict, item['uuid']):
                 raise DropItem("Duplicate item found:%s" % item)
 

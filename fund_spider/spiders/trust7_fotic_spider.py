@@ -19,7 +19,7 @@ from fund_spider.items import FundSpiderItem
 from util.codeConvert import GetNowTime
 
 
-class TrustCrctrustSpider(scrapy.Spider):
+class TrustFoticSpider(scrapy.Spider):
     name = "trust7_fotic_spider"
     allowed_domains = ["fotic.com.cn"]
 
