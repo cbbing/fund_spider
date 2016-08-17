@@ -50,7 +50,7 @@ class TrustFoticSpider(scrapy.Spider):
                     "sDate": "",
                     "eDate": "",
                     "pageNo": "1",
-                    "pageSize": "10"
+                    "pageSize": "10000"
                     }
         yield FormRequest(response.url, formdata=formdata, callback=self.parse_item, dont_filter=True)
 
@@ -58,12 +58,13 @@ class TrustFoticSpider(scrapy.Spider):
         # 请求其它页
         encodejson = json.loads(response.body, encoding='utf8')
         totalPages = encodejson['totalCount']
-        for i in range(2, totalPages+1):
+        totalPages /= 1000
+        for i in range(2, totalPages+2):
             formdata = {"programName": "",
                         "sDate": "",
                         "eDate": "",
                         "pageNo": str(i),
-                        "pageSize": "10"
+                        "pageSize": "10000"
                         }
             yield FormRequest(response.url, callback=self.parse_item, formdata=formdata, dont_filter=True)
 

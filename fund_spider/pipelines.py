@@ -9,6 +9,7 @@ import re
 import redis
 import pandas as pd
 from sqlalchemy import create_engine
+import threading
 
 from scrapy.exceptions import DropItem
 from items import FundSpiderItem
@@ -19,6 +20,8 @@ engine = create_engine('mysql+mysqldb://{}:{}@{}:3306/{}'.format(settings.MYSQL_
                        pool_size=8)
 redis_db4 = redis.Redis(host=settings.REDIS_HOST, port=6379, db=4, password=settings.REDIS_PWD)
 redis_fund_dict = "fund_uuids"
+
+mutex = threading.Lock()
 
 class DuplicatePipeline(object):
     """
@@ -46,31 +49,32 @@ class SetFundIDPipeline(object):
     """
     def process_item(self, item, spider):
 
-        return item
+        if mutex.acquire(): # 互斥锁 加锁
 
-        table = "classifier_db.t_fund_nv_data"
-        sql = "select distinct fund_id from {} where fund_name='{}' ".format(table, item['fund_name'])
-        df = pd.read_sql(sql, engine)
-        fund_ids = df['fund_id'].get_values()
-        if len(fund_ids) and fund_ids[0]: # 数据库中存在fund_id, 直接赋值
-            item['fund_id'] = fund_ids[0]
-        else:  # 数据库中不存在, 新建一个fund_id
-            sql = "SELECT distinct fund_id FROM {}  where org_id ='{}' order by length(fund_id) desc, fund_id desc".format(
-                table, item['org_id']
-            )
+            table = "classifier_db.t_fund_nv_data"
+            sql = "select distinct fund_id from {} where fund_name='{}' ".format(table, item['fund_name'])
             df = pd.read_sql(sql, engine)
             fund_ids = df['fund_id'].get_values()
-            if len(fund_ids) and fund_ids[0]:
-                find_last_id = re.search("XT(\d+)", fund_ids[0])
-                if find_last_id:
-                    last_id = int(find_last_id.group(1))
-                index = '0'+str(last_id) if last_id < 10 else str(last_id)
-                new_fund_id = item['org_id'] + "XT" + index
-            else:
-                new_fund_id = item['org_id'] + "XT" + "01"
+            if len(fund_ids) and fund_ids[0]: # 数据库中存在fund_id, 直接赋值
+                item['fund_id'] = fund_ids[0]
+            else:  # 数据库中不存在, 新建一个fund_id
+                sql = "SELECT distinct fund_id FROM {}  where org_id ='{}' order by length(fund_id) desc, fund_id desc".format(
+                    table, item['org_id']
+                )
+                df = pd.read_sql(sql, engine)
+                fund_ids = df['fund_id'].get_values()
+                if len(fund_ids) and fund_ids[0]:
+                    find_last_id = re.search("XT(\d+)", fund_ids[0])
+                    if find_last_id:
+                        last_id = int(find_last_id.group(1))+1
+                    index = '0'+str(last_id) if last_id < 10 else str(last_id)
+                    new_fund_id = item['org_id'] + "XT" + index
+                else:
+                    new_fund_id = item['org_id'] + "XT" + "01"
 
-            item['fund_id'] = new_fund_id
+                item['fund_id'] = new_fund_id
 
+            mutex.release()  # 互斥锁 释放
         return item
 
 

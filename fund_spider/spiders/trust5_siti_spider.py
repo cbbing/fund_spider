@@ -42,7 +42,7 @@ class TrustSitiSpider(scrapy.Spider):
 
             item['entry_time'] = GetNowTime()
             item['source_code'] = 1
-            item['source'] = 'response.url'
+            item['source'] = response.url
             item['org_id'] = 'TG0005'
 
             item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
