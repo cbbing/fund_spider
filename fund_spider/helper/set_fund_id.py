@@ -34,11 +34,8 @@ def set_fund_id(org_id):
         engine.execute(sql_update)
 
 if __name__ == "__main__":
-    set_fund_id('TG0002')
-    set_fund_id('TG0003')
-    set_fund_id('TG0004')
-    set_fund_id('TG0005')
-    set_fund_id('TG0006')
+    set_fund_id('TG0007')
+
 
 
 

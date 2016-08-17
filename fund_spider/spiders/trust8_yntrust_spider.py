@@ -23,22 +23,27 @@ class TrustYnTrustSpider(scrapy.Spider):
     start_urls = ["http://www.yntrust.com/index!netValue.xhtml?pager.offset=0&id="]
 
     def parse(self, response):
-        self.log(response.url)
+        # self.log(response.url)
 
-        # 第一页
-        yield scrapy.Request(response.url, callback=self.parse_item)
+        # 解析当前页
+        yield scrapy.Request(response.url, callback=self.parse_item, dont_filter=True)
 
         # 翻页
         urls = response.xpath('//a[contains(@href, "/index!netValue.xhtml?pager.offset")]/@href').extract()
         for url in urls:
             if 'http' not in url:
                 url = "http://www.yntrust.com" + url
-            yield scrapy.Request(url, callback=self.parse_item)
+            yield scrapy.Request(url, callback=self.parse)
 
     def parse_item(self, response):
-        self.log(response.url)
+        # self.log(response.url)
+
         soup = bs(response.body, 'lxml')
-        trs = soup.find_all('dd')
+        product_view = soup.find('div', {'class':'product_view'})
+        if not product_view:
+            return
+
+        trs = product_view.find_all('dd')
         for tr in trs:
 
             item = FundSpiderItem()
@@ -65,23 +70,28 @@ class TrustYnTrustSpider(scrapy.Spider):
             item['org_id'] = 'TG0008'
 
             # item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
-            # print item
+            print item
 
             # 历史净值
             href = a['href']
             if 'http' not in href:
-                href = "http://www.yntrust.com/" + href
+                href = "http://www.yntrust.com" + href
             yield scrapy.Request(href, callback=lambda response, item=item: self.parse_history_link(response, item))
 
     def parse_history_link(self, response, item):
-        self.log(response.url)
+        # self.log(response.url)
+
+        # 获取当前页的历史净值
+        yield scrapy.Request(response.url,
+                             callback=lambda response, item=item: self.parse_history_nav(response, item), dont_filter=True)
+
 
         # 翻页
         urls = response.xpath('//a[contains(@href, "/index!netValueView.xhtml?pager.offset=")]/@href').extract()
         for url in urls:
             url = url if 'http' in url else "http://www.yntrust.com" + url
             yield scrapy.Request(url,
-                                 callback=lambda response, item=item: self.parse_history_nav(response, item))
+                                 callback=lambda response, item=item: self.parse_history_link(response, item))
 
     def parse_history_nav(self, response, itemTop):
         """
@@ -90,7 +100,7 @@ class TrustYnTrustSpider(scrapy.Spider):
         :param itemTop:
         :return:
         """
-        self.log(response.url)
+        self.log("parse_history_nav:"+response.url)
 
         soup = bs(response.body, 'lxml')
         article = soup.find('div', {'class':'article'})
