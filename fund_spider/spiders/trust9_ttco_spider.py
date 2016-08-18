@@ -7,13 +7,15 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-import scrapy
-
 from bs4 import BeautifulSoup as bs
 import re
 import hashlib
 import json
-from scrapy.http import FormRequest
+from selenium import webdriver
+import time
+
+import scrapy
+from scrapy.http import FormRequest, HtmlResponse
 
 from fund_spider.items import FundSpiderItem
 from util.codeConvert import GetNowTime
@@ -63,7 +65,6 @@ class TrustTtcopider(scrapy.Spider):
 
     def parse_item(self, response):
         self.log(response.url)
-        # print response.url
 
         soup = bs(response.body, 'lxml')
         trs = soup.find_all('tr')
@@ -84,31 +85,39 @@ class TrustTtcopider(scrapy.Spider):
             item['entry_time'] = GetNowTime()
             item['source_code'] = 1
             item['source'] = response.url
-            item['org_id'] = 'TG0005'
+            item['org_id'] = 'TG0009'
 
             item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
+
+            # http: // www.ttco.cn / ttco / product_detail_founded?product.id = AF8A170DAC444375A47F368F28F83254
+            href = tds[0].find('a')['href']
+            findProId = re.search("product.id\s*=\s*(\w+)", href)
+            if not findProId:
+                continue
+            item['fund_code'] = findProId.group(1)
+
             print item
-            # yield item
+            yield item
 
             # 历史净值
-            href = tds[0].find('a')['href']
-            if 'http' not in href:
-                href = "http://www.ttco.cn" + href
-            yield scrapy.Request(href, callback=lambda response, item=item: self.parse_history_link(response, item))
+            url = "http://www.ttco.cn/ttco/networthList?netWorthNetPage.start=0&&product.id={}".format(item['fund_code'])
+            yield scrapy.Request(url, callback=lambda response, item=item: self.parse_history_link(response, item))
 
     def parse_history_link(self, response, item):
         self.log(response.url)
 
         # 获取当前页的历史净值
         yield scrapy.Request(response.url,
-                             callback=lambda response, item=item: self.parse_history_nav(response, item))
+                             callback=lambda response, item=item: self.parse_history_nav(response, item),
+                             dont_filter=True)
 
         # 翻页
-        urls = response.xpath('//a[contains(@href, "http://www.ttco.cn/ttco/networthList?netWorthNetPage.start=")]/@href').extract()
+        urls = response.xpath('//a[contains(@href, "http://www.ttco.cn/ttco/networthList?netWorthNetPage.start")]/@href').extract()
         for url in urls:
             url = url if 'http' in url else "http://www.ttco.cn" + url
             yield scrapy.Request(url,
-                                 callback=lambda response, item=item: self.parse_history_link(response, item))
+                                 callback=lambda response, item=item: self.parse_history_nav(response, item))
+
 
     def parse_history_nav(self, response, itemTop):
         """
@@ -127,7 +136,7 @@ class TrustTtcopider(scrapy.Spider):
                 continue
 
             item = FundSpiderItem()
-            # item['fund_code'] = itemTop['fund_code']
+            item['fund_code'] = itemTop['fund_code']
             item['fund_name'] = itemTop['fund_name']
             item['nav'] = tds[1].text.strip()
             item['added_nav'] = tds[2].text.strip()
