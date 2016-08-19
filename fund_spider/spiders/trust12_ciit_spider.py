@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-五矿信托
+兴业信托
 """
 
 import sys
@@ -22,11 +22,11 @@ from util.codeConvert import GetNowTime
 
 
 class TrustMinTrustSpider(scrapy.Spider):
-    name = "trust11_mintrust_spider"
-    allowed_domains = ["mintrust.com"]
+    name = "trust12_ciit_spider"
+    allowed_domains = ["ciit.com.cn"]
 
     start_urls = (
-        'http://www.mintrust.com/wkxtweb/product/page_networth',
+        'http://www.ciit.com.cn/xingyetrust-web/netvalues/netvalue!getValue?type=1',
     )
 
     # def start_requests(self):
@@ -52,15 +52,14 @@ class TrustMinTrustSpider(scrapy.Spider):
 
         # 请求其它页
         soup = bs(response.body, 'lxml')
-        pageSum = soup.find('font', {'id':'_pageSum'})
+        pageSum = soup.find('a', text='尾页')
         if pageSum:
-            page_sum = int(pageSum.text)
-            for i in range(2, page_sum+1):
-                formdata = {
-                            "netWorthPage.pageSize": "10",
-                            "netWorthPage.pageNum": str(i),
-                            }
-                yield FormRequest(response.url, callback=self.parse_item, formdata=formdata, dont_filter=True)
+            findPage = re.search('\d+', pageSum['href'])
+            if findPage:
+                page_sum = int(findPage.group())
+                for i in range(2, page_sum+1):
+                    url = response.url + "&currentpage=" + str(i)
+                    yield scrapy.Request(url, callback=self.parse_item)
 
 
     def parse_item(self, response):
@@ -70,18 +69,18 @@ class TrustMinTrustSpider(scrapy.Spider):
         trs = soup.find_all('tr')
         for tr in trs:
             tds = tr.find_all('td')
-            if len(tds) != 4 or tds[0].text == '产品名称':
+            if len(tds) != 6 or tds[0].text == '序号':
                 continue
 
             item = FundSpiderItem()
 
             # item['fund_name'] = tds[0].text.strip()
-            item['fund_full_name'] = tds[0].text.strip()
+            item['fund_full_name'] = tds[1].text.strip()
             # item['open_date'] = tds[2].text.strip()
-            item['nav'] = tds[1].text.strip()
+            item['nav'] = tds[3].text.strip()
             item['added_nav'] = tds[2].text.strip()
-            # item['foundation_date'] = tds[8].text.strip()
-            item['statistic_date'] = tds[3].text.strip()
+            item['foundation_date'] = tds[2].text.strip()
+            item['statistic_date'] = tds[4].text.strip()
 
             item['entry_time'] = GetNowTime()
             item['source_code'] = 1
