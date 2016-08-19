@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-西藏信托
+五矿信托
 """
 
 import sys
@@ -21,12 +21,12 @@ from fund_spider.items import FundSpiderItem
 from util.codeConvert import GetNowTime
 
 
-class TrustTtcoSpider(scrapy.Spider):
-    name = "trust9_ttco_spider"
-    allowed_domains = ["ttco.cn"]
+class TrustMinTrustSpider(scrapy.Spider):
+    name = "trust11_mintrust_spider"
+    allowed_domains = ["mintrust.com"]
 
     start_urls = (
-        'http://www.ttco.cn/ttco/page_networth',
+        'http://www.mintrust.com/wkxtweb/product/page_networth',
     )
 
     # def start_requests(self):
@@ -56,7 +56,7 @@ class TrustTtcoSpider(scrapy.Spider):
         if pageSum:
             page_sum = int(pageSum.text)
             for i in range(2, page_sum+1):
-                formdata = {"st": "dd",
+                formdata = {
                             "netWorthPage.pageSize": "10",
                             "netWorthPage.pageNum": str(i),
                             }
@@ -70,22 +70,22 @@ class TrustTtcoSpider(scrapy.Spider):
         trs = soup.find_all('tr')
         for tr in trs:
             tds = tr.find_all('td')
-            if len(tds) != 8 or tds[0].text == '产品名称':
+            if len(tds) != 4 or tds[0].text == '产品名称':
                 continue
 
             item = FundSpiderItem()
 
             item['fund_name'] = tds[0].text.strip()
             # item['open_date'] = tds[2].text.strip()
-            item['nav'] = tds[3].text.strip()
-            item['added_nav'] = tds[4].text.strip()
+            item['nav'] = tds[1].text.strip()
+            item['added_nav'] = tds[2].text.strip()
             # item['foundation_date'] = tds[8].text.strip()
-            item['statistic_date'] = tds[7].text.strip()
+            item['statistic_date'] = tds[3].text.strip()
 
             item['entry_time'] = GetNowTime()
             item['source_code'] = 1
             item['source'] = response.url
-            item['org_id'] = 'TG0009'
+            item['org_id'] = 'TG0011'
 
             item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
 
@@ -100,7 +100,7 @@ class TrustTtcoSpider(scrapy.Spider):
             yield item
 
             # 历史净值
-            url = "http://www.ttco.cn/ttco/networthList?netWorthNetPage.start=0&&product.id={}".format(item['fund_code'])
+            url = "http://www.mintrust.com/wkxtweb//product/networthList?netWorths.start=0&&product.id={}".format(item['fund_code'])
             yield scrapy.Request(url, callback=lambda response, item=item: self.parse_history_link(response, item))
 
     def parse_history_link(self, response, item):
@@ -112,9 +112,9 @@ class TrustTtcoSpider(scrapy.Spider):
                              dont_filter=True)
 
         # 翻页
-        urls = response.xpath('//a[contains(@href, "http://www.ttco.cn/ttco/networthList?netWorthNetPage.start")]/@href').extract()
+        urls = response.xpath('//a[contains(@href, "http://www.mintrust.com/wkxtweb//product/networthList?netWorths.start")]/@href').extract()
         for url in urls:
-            url = url if 'http' in url else "http://www.ttco.cn" + url
+            # url = url if 'http' in url else "http://www.ttco.cn" + url
             yield scrapy.Request(url,
                                  callback=lambda response, item=item: self.parse_history_nav(response, item))
 

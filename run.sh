@@ -7,3 +7,5 @@ scrapy crawl trust6_crctrust_spider -s LOG_FILE=Log/trust6_crctrust_spider.log
 scrapy crawl trust7_fotic_spider -s LOG_FILE=Log/trust7_fotic_spider.log
 scrapy crawl trust8_yntrust_spider -s LOG_FILE=Log/trust8_yntrust_spider.log
 scrapy crawl trust9_ttco_spider -s LOG_FILE=Log/trust9_ttco_spider.log
+scrapy crawl trust10_wtixa_spider -s LOG_FILE=Log/trust10_wtixa_spider.log
+scrapy crawl trust11_mintrust_spider -s LOG_FILE=Log/trust11_mintrust_spider.log

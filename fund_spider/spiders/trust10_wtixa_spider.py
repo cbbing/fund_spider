@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-陕国投
+西部信托
 """
 
 import sys
@@ -17,7 +17,7 @@ from fund_spider.items import FundSpiderItem
 from util.codeConvert import GetNowTime
 
 
-class TrustSitiSpider(scrapy.Spider):
+class TrustWtixaSpider(scrapy.Spider):
     name = "trust10_wtixa_spider"
     allowed_domains = ["wti-xa.com"]
     start_urls = [
@@ -46,32 +46,32 @@ class TrustSitiSpider(scrapy.Spider):
             item['entry_time'] = GetNowTime()
             item['source_code'] = 1
             item['source'] = response.url
-            item['org_id'] = 'TG0005'
+            item['org_id'] = 'TG0010'
 
             item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
-            # print item['uuid'], item['fund_name'], item['statistic_date']
+            print item['uuid'], item['fund_name'], item['statistic_date']
             yield item
 
             # 历史净值
-            href = tds[1].find('a')['href']
+            href = tds[0].find('a')['href']
             if 'http' not in href:
-                href = "http://www.siti.com.cn/" + href
-            yield scrapy.Request(href, callback=lambda response, item=item: self.parse_history_link(response, item))
+                href = "http://www.wti-xa.com/" + href
+            yield scrapy.Request(href, callback=lambda response, item=item: self.parse_history_nav(response, item))
 
 
-    def parse_history_link(self, response, item):
-        self.log(response.url)
-
-        soup = bs(response.body, 'lxml')
-        pages = soup.find('div', {'class':'pages'})
-        if pages:
-            hrefs = pages.find_all('a')
-            for a in hrefs:
-                href = a['href']
-                if 'http' not in href:
-                    href = "http://www.siti.com.cn/" + href
-                yield scrapy.Request(href,
-                                     callback=lambda response, item=item: self.parse_history_nav(response, item))
+    # def parse_history_link(self, response, item):
+    #     self.log(response.url)
+    #
+    #     soup = bs(response.body, 'lxml')
+    #     pages = soup.find('div', {'class':'pages'})
+    #     if pages:
+    #         hrefs = pages.find_all('a')
+    #         for a in hrefs:
+    #             href = a['href']
+    #             if 'http' not in href:
+    #                 href = "http://www.siti.com.cn/" + href
+    #             yield scrapy.Request(href,
+    #                                  callback=lambda response, item=item: self.parse_history_nav(response, item))
 
 
     def parse_history_nav(self, response, itemTop):
@@ -87,17 +87,18 @@ class TrustSitiSpider(scrapy.Spider):
         trs = soup.find_all('tr')
         for tr in trs:
             tds = tr.find_all('td')
-            if len(tds) != 6 or '年' not in tds[0].text.strip() :
+            if len(tds) != 5 or tds[0].text.strip() == '日期':
                 continue
 
             item = FundSpiderItem()
             # item['fund_code'] = itemTop['fund_code']
             item['fund_name'] = itemTop['fund_name']
-            item['open_date'] = itemTop['open_date']
-            item['nav'] = tds[2].text.strip()
-            item['added_nav'] = tds[3].text.strip()
+            # item['open_date'] = itemTop['open_date']
+            item['nav'] = tds[1].text.strip()
+            if tds[2].text.strip() != '-':
+                item['added_nav'] = tds[2].text.strip()
             item['foundation_date'] = itemTop['foundation_date']
-            item['statistic_date'] = tds[0].text.strip().replace('年','-').replace('月','-').replace('日','')
+            item['statistic_date'] = tds[0].text.strip()
 
             item['entry_time'] = GetNowTime()
             item['source_code'] = itemTop['source_code']
@@ -105,5 +106,5 @@ class TrustSitiSpider(scrapy.Spider):
             item['org_id'] = itemTop['org_id']
 
             item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
-            # print item['fund_name'], item['statistic_date']
+            print item['fund_name'], item['statistic_date']
             yield item
