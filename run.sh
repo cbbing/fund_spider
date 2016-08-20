@@ -9,3 +9,4 @@ scrapy crawl trust8_yntrust_spider -s LOG_FILE=Log/trust8_yntrust_spider.log
 scrapy crawl trust9_ttco_spider -s LOG_FILE=Log/trust9_ttco_spider.log
 scrapy crawl trust10_wtixa_spider -s LOG_FILE=Log/trust10_wtixa_spider.log
 scrapy crawl trust11_mintrust_spider -s LOG_FILE=Log/trust11_mintrust_spider.log
+scrapy crawl trust12_ciit_spider -s LOG_FILE=Log/trust12_ciit_spider.log
