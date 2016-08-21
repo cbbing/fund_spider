@@ -18,7 +18,7 @@ from fund_spider.items import FundSpiderItem
 from util.codeConvert import GetNowTime
 
 
-class TrustHuabaoSpider(scrapy.Spider):
+class TrustHuaxinSpider(scrapy.Spider):
     name = "trust13_huaxintrust_spider"
     allowed_domains = ["huaxintrust.com"]
 
@@ -47,7 +47,7 @@ class TrustHuabaoSpider(scrapy.Spider):
 
         # 请求所有分页
         hrefs = response.xpath('//a[contains(@href, "&nid=36-46")]/@href').extract()
-        for href in hrefs:
+        for href in set(hrefs):
             if 'http' not in href:
                 href = "http://www.huaxintrust.com/news2.asp" + href
 
