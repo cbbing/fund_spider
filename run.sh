@@ -12,3 +12,4 @@ scrapy crawl trust10_wtixa_spider -s LOG_FILE=Log/trust10_wtixa_spider.log
 scrapy crawl trust11_mintrust_spider -s LOG_FILE=Log/trust11_mintrust_spider.log
 scrapy crawl trust12_ciit_spider -s LOG_FILE=Log/trust12_ciit_spider.log  #DOWNLOAD_DELAY = 5
 scrapy crawl trust13_huaxintrust_spider -s LOG_FILE=Log/trust13_huaxintrust_spider.log
+scrapy crawl trust14_huarongtrust_spider -s LOG_FILE=Log/trust14_huarongtrust_spider.log

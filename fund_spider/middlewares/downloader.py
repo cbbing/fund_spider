@@ -12,7 +12,7 @@ class CustomDownloader(object):
         cap["phantomjs.page.settings.resourceTimeout"] = 1000
         cap["phantomjs.page.settings.loadImages"] = True
         cap["phantomjs.page.settings.disk-cache"] = True
-        cap["phantomjs.page.customHeaders.Cookie"] = 'SINAGLOBAL=3955422793326.2764.1451802953297; '
+        # cap["phantomjs.page.customHeaders.Cookie"] = 'SINAGLOBAL=3955422793326.2764.1451802953297; '
         self.driver = webdriver.PhantomJS(desired_capabilities=cap)
         wait = ui.WebDriverWait(self.driver,10)
 
