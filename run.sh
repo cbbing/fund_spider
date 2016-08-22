@@ -14,3 +14,7 @@ scrapy crawl trust12_ciit_spider -s LOG_FILE=Log/trust12_ciit_spider.log  #DOWNL
 scrapy crawl trust13_huaxintrust_spider -s LOG_FILE=Log/trust13_huaxintrust_spider.log
 scrapy crawl trust14_huarongtrust_spider -s LOG_FILE=Log/trust14_huarongtrust_spider.log
 scrapy crawl trust15_pingan_spider -s LOG_FILE=Log/trust15_pingan_spider.log
+scrapy crawl trust16_bjitic_spider -s LOG_FILE=Log/trust16_bjitic_spider.log
+scrapy crawl trust17_gdycxt_spider -s LOG_FILE=Log/trust17_gdycxt_spider.log
+scrapy crawl trust18_xmitic_spider -s LOG_FILE=Log/trust18_xmitic_spider.log
+scrapy crawl trust19_schtrust_spider -s LOG_FILE=Log/trust19_schtrust_spider.log
