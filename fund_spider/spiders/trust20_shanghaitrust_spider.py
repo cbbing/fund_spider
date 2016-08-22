@@ -51,12 +51,11 @@ class TrustShanghaiSpider(scrapy.Spider):
         for url in hrefs:
             url = url if 'http' in url else "http://www.shanghaitrust.com" + url
             if 'red' in url or 'purple' in url or 'bojin' in url:
-                # pass
                 yield scrapy.Request(url, callback=self.parse_item)
-                break
-            # else:
-            #     url = url.replace('gaikuo', 'netvalue')
-            #     yield scrapy.Request(url, callback=self.parse_item_plus)
+
+            else:
+                url = url.replace('gaikuo', 'netvalue')
+                yield scrapy.Request(url, callback=self.parse_item_plus)
 
 
 
