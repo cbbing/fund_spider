@@ -18,3 +18,4 @@ scrapy crawl trust16_bjitic_spider -s LOG_FILE=Log/trust16_bjitic_spider.log
 scrapy crawl trust17_gdycxt_spider -s LOG_FILE=Log/trust17_gdycxt_spider.log
 scrapy crawl trust18_xmitic_spider -s LOG_FILE=Log/trust18_xmitic_spider.log
 scrapy crawl trust19_schtrust_spider -s LOG_FILE=Log/trust19_schtrust_spider.log
+scrapy crawl trust20_shanghaitrust_spider -s LOG_FILE=Log/trust20_shanghaitrust_spider.log
