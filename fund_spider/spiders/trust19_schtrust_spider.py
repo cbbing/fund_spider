@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-厦门信托
+四川信托
 """
 
 import sys
