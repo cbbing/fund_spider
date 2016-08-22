@@ -94,6 +94,7 @@ class TrustShanghaiSpider(scrapy.Spider):
         item = FundSpiderItem()
         item['fund_code'] = codeFind.group(1)
         item['fund_name'] = fund_name
+        item['fund_full_name'] = fund_name
         item['foundation_date'] = foundation_date
 
         # 产品净值
@@ -121,6 +122,7 @@ class TrustShanghaiSpider(scrapy.Spider):
                 item = FundSpiderItem()
                 item['fund_code'] = op['value']
                 item['fund_name'] = fund_name + op.text
+                item['fund_full_name'] = item['fund_name']
 
                 # 产品净值
                 href = "http://www.shanghaitrust.com/chart-web/chart/fundnettable?fundcode={}&from=2006-01-28&to={}&pages=1-100" \
@@ -188,6 +190,7 @@ class TrustShanghaiSpider(scrapy.Spider):
                 item = FundSpiderItem()
                 item['fund_code'] = itemTop['fund_code']
                 item['fund_name'] = itemTop['fund_name']
+                item['fund_full_name'] = item['fund_name']
                 item['nav'] = tds[1].text.strip()
                 item['added_nav'] = tds[2].text.strip()
                 item['foundation_date'] = itemTop['foundation_date']
@@ -208,6 +211,7 @@ class TrustShanghaiSpider(scrapy.Spider):
                 item = FundSpiderItem()
                 item['fund_code'] = itemTop['fund_code']
                 item['fund_name'] = itemTop['fund_name']
+                item['fund_full_name'] = item['fund_name']
                 item['nav'] = tds[1].text.strip()
                 # item['added_nav'] = tds[2].text.strip()
                 item['statistic_date'] = tds[0].text.strip()

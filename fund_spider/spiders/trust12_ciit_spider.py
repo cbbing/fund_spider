@@ -75,7 +75,7 @@ class TrustMinTrustSpider(scrapy.Spider):
             item = FundSpiderItem()
 
             item['fund_name'] = tds[1].text.strip()
-            item['fund_full_name'] = tds[1].text.strip()
+            item['fund_full_name'] = item['fund_name']
             # item['open_date'] = tds[2].text.strip()
             item['nav'] = tds[3].text.strip()
             # item['added_nav'] = tds[2].text.strip()

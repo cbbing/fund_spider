@@ -89,7 +89,7 @@ class TrustCrctrustSpider(scrapy.Spider):
 
             item['fund_code'] = data['jjdm'].strip()
             item['fund_name'] = data['jjjc'].strip()
-            # item['fund_full_name'] = ''
+            item['fund_full_name'] = item['fund_name']
             # item['open_date'] = tds[2].text.strip()
             item['nav'] = data['nav'].strip()
             # item['added_nav'] = tds[2].text.strip()
@@ -171,6 +171,7 @@ class TrustCrctrustSpider(scrapy.Spider):
             item = FundSpiderItem()
             item['fund_code'] = itemTop['fund_code']
             item['fund_name'] = itemTop['fund_name']
+            item['fund_full_name'] = itemTop['fund_full_name']
             item['nav'] = data['nav'].strip()
             # item['added_nav'] = tds[2].text.strip()
             item['foundation_date'] = itemTop['foundation_date']

@@ -34,6 +34,7 @@ class TrustZritcSpider(scrapy.Spider):
 
             item = FundSpiderItem()
             item['fund_name'] = tds[0].text.strip()
+            item['fund_full_name'] = item['fund_name']
             item['nav'] = tds[1].text.strip()
             item['added_nav'] = tds[2].text.strip()
             item['statistic_date'] = tds[3].text.strip()

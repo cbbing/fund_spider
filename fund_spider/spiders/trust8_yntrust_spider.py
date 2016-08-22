@@ -52,6 +52,7 @@ class TrustYnTrustSpider(scrapy.Spider):
             if not a:
                 continue
             item['fund_name'] = a.text.strip()
+            item['fund_full_name'] = item['fund_name']
 
             h2s = tr.find_all('h2')
             if len(h2s) == 2:
@@ -117,6 +118,7 @@ class TrustYnTrustSpider(scrapy.Spider):
 
             # item['fund_code'] = itemTop['fund_code']
             item['fund_name'] = itemTop['fund_name']
+            item['fund_full_name'] = itemTop['fund_full_name']
             # item['open_date'] = itemTop['open_date']
             item['foundation_date'] = itemTop['foundation_date']
 
