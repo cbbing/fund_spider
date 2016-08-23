@@ -17,10 +17,26 @@ engine_obj = create_engine(
                                               settings.MYSQL_DBNAME_OBJ),connect_args={'charset': 'utf8'})
 
 def synchronize_to_db():
-    sql = "select uuid, org_id, fund_id, fund_name, fund_full_name, open_date, nav, added_nav, foundation_date, statistic_date, entry_time, " \
-          "source_code, source from classifier_db.t_fund_nv_data where syn_status=0"
-    datas = pd.read_sql(sql, engine_src, chunksize=1000)
-    for df in datas:
-        uuids = df['uuid'].get_values()
 
-        del df['uuid']
+    for i in range(1, 23):
+        org_id = 'TG000{}'.format(i) if i < 10 else 'TG00{}'.format(i)
+
+        sql = "select uuid, org_id, fund_id, fund_name, fund_full_name, open_date, nav, added_nav, foundation_date, statistic_date, entry_time, " \
+              "source_code, source from classifier_db.t_fund_nv_data where org_id='{}' and syn_status=0".format(org_id)
+        datas = pd.read_sql(sql, engine_src, chunksize=1000)
+        for df in datas:
+            uuids = df['uuid'].get_values()
+
+            del df['uuid']
+            print df.head()
+            print df.columns
+
+            df.to_sql("t_fund_nv_data", engine_obj, if_exists='append', index=False)
+            for uuid in uuids:
+                sql_u = "update classifier_db.t_fund_nv_data set syn_status=1 where uuid='{}' ".format(uuid)
+                engine_src.execute(sql_u)
+
+
+
+if __name__ == "__main__":
+    synchronize_to_db()
