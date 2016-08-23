@@ -120,21 +120,36 @@ class TrustSxxtSpider(scrapy.Spider):
 
         soup = bs(response.body, 'lxml')
         trs = soup.find_all('tr')
+        fund_name = None
         for tr in trs:
             tds = tr.find_all('td')
-            if len(tds) == 2 and '产品名称' in tds[0].text.strip():
+            if len(tds) >= 1 and '产品名称' in tds[0].text.strip():
                 fund_name = tds[0].text.replace('产品名称：', '').strip()
-                foundation_date = tds[1].text.replace("成立日期：","").strip()
-            elif len(tds) == 3:
+                if len(tds) == 1:
+                    if '成立日期：' in fund_name:
+                        splits = fund_name.split("成立日期：")
+                        fund_name = splits[0].strip()
+                        foundation_date = splits[1].strip()
+                elif len(tds) >=2:
+                    foundation_date = tds[1].text.replace("成立日期：","").strip()
+                else:
+                    foundation_date = ''
+            elif len(tds) >= 3:
                 if tds[0].text.strip() == '公告日期':
                     continue
                 else:
+                    if fund_name is None:
+                        continue
+
                     item = FundSpiderItem()
                     item['fund_name'] = fund_name
                     item['foundation_date'] = foundation_date
 
                     item['statistic_date'] = tds[0].text.strip().replace("年", '-').replace('月','-').replace('日','')
                     item['nav'] = tds[1].text.strip()
+
+                    if len(item['statistic_date']) == 0 or len(item['nav']) == 0:
+                        continue
 
                     item['entry_time'] = GetNowTime()
                     item['source_code'] = 1
