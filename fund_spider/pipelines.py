@@ -95,7 +95,7 @@ class MySQLStorePipeline(object):
         df = pd.DataFrame([item])
         print df
         df.to_sql('t_fund_nv_data', engine, if_exists='append', index=False)
-        redis_db4.hset(redis_fund_dict, item['uuid'], 0)
+        redis_db4.hset(redis_fund_dict, item['uuid'], item['org_id'])
 
         return item
 
