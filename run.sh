@@ -22,3 +22,6 @@ scrapy crawl trust20_shanghaitrust_spider -s LOG_FILE=Log/trust20_shanghaitrust_
 scrapy crawl trust21_bocommtrust_spider -s LOG_FILE=Log/trust21_bocommtrust_spider.log
 scrapy crawl trust22_zhtrust_spider -s LOG_FILE=Log/trust22_zhtrust_spider.log
 scrapy crawl trust23_sxxt_spider -s LOG_FILE=Log/trust23_sxxt_spider.log
+scrapy crawl trust24_huaao_spider -s LOG_FILE=Log/trust24_huaao_spider.log
+scrapy crawl trust25_huaao_spider -s LOG_FILE=Log/trust25_huaao_spider.log
+scrapy crawl trust26_kunluntrust_spider -s LOG_FILE=Log/trust26_kunluntrust_spider.log
