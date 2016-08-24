@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-华澳信托
+昆仑信托
 """
 
 import sys
