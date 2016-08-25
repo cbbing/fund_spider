@@ -25,3 +25,7 @@ scrapy crawl trust23_sxxt_spider -s LOG_FILE=Log/trust23_sxxt_spider.log
 scrapy crawl trust24_huaao_spider -s LOG_FILE=Log/trust24_huaao_spider.log
 scrapy crawl trust25_huaao_spider -s LOG_FILE=Log/trust25_huaao_spider.log
 scrapy crawl trust26_kunluntrust_spider -s LOG_FILE=Log/trust26_kunluntrust_spider.log
+
+scrapy crawl trust28_zyxt_spider -s LOG_FILE=Log/trust28_zyxt_spider.log
+
+scrapy crawl trust31_zjtrust_spider -s LOG_FILE=Log/trust31_zjtrust_spider.log
