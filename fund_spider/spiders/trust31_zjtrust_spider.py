@@ -39,28 +39,28 @@ class TrustZjSpider(scrapy.Spider):
     #     return requests
 
 
+    # def parse(self, response):
+    #     self.log(response.url)
+    #
+    #     # 请求第一页
+    #     yield scrapy.Request(response.url, callback=self.parse_item, dont_filter=True)
+    #
+    #     # 请求其它页
+    #     pageFind = re.search("1\/(\d+)\s*页", response.body)# 获取页数
+    #     if pageFind:
+    #         page_count = int(pageFind.group(1))
+    #         for i in range(2, page_count+1):
+    #             url = "http://www.huaao-trust.com/list/705/{}.shtml".format(i)
+    #             yield scrapy.Request(url, callback=self.parse_item)
+
+
+
     def parse(self, response):
         self.log(response.url)
 
-        # 请求第一页
-        yield scrapy.Request(response.url, callback=self.parse_item, dont_filter=True)
-
-        # 请求其它页
-        pageFind = re.search("1\/(\d+)\s*页", response.body)# 获取页数
-        if pageFind:
-            page_count = int(pageFind.group(1))
-            for i in range(2, page_count+1):
-                url = "http://www.huaao-trust.com/list/705/{}.shtml".format(i)
-                yield scrapy.Request(url, callback=self.parse_item)
-
-
-
-    def parse_item(self, response):
-        self.log(response.url)
-
-        hrefs = response.xpath("//li/a[contains(@href, '/news/')]/@href").extract()
+        hrefs = response.xpath("//a[contains(@href, '/cn/page/41/')]/@href").extract()
         for href in hrefs:
-            href = href if 'http' in href else "http://www.huaao-trust.com" + href
+            href = href if 'http' in href else "http://www.zjtrust.com.cn" + href
             yield scrapy.Request(href, callback=self.parse_history_nav)
 
 
@@ -119,36 +119,22 @@ class TrustZjSpider(scrapy.Spider):
 
         soup = bs(response.body, 'lxml')
         trs = soup.find_all('tr')
-        first_col = '产品名称'
         for tr in trs:
             tds = tr.find_all('td')
-            if len(tds) not in (4,5):
-                continue
-            if '名称' in tds[0].text.strip() or '日期' in tds[0].text.strip():
-                first_col = tds[0].text.strip()
+            if len(tds) != 3 or tds[0].text == '产品名称':
                 continue
 
             item = FundSpiderItem()
             # item['fund_code'] = itemTop['fund_code']
-            if first_col != '日期':
-                item['fund_name'] = tds[0].text.strip()
-                item['fund_full_name'] = item['fund_name']
-                item['nav'] = tds[3].text.strip()
-                if len(tds) == 5:
-                    item['added_nav'] = tds[4].text.strip()
-                item['foundation_date'] = tds[1].text.strip()
-                item['statistic_date'] = tds[2].text.strip()
-            else:
-                item['fund_name'] = tds[1].text.strip()
-                item['fund_full_name'] = item['fund_name']
-                item['nav'] = tds[4].text.strip()
-                item['foundation_date'] = tds[2].text.strip()
-                item['statistic_date'] = tds[0].text.strip()
+            item['fund_name'] = tds[0].text.strip()
+            item['fund_full_name'] = item['fund_name']
+            item['nav'] = tds[1].text.strip()
+            item['statistic_date'] = tds[2].text.strip()
 
             item['entry_time'] = GetNowTime()
             item['source_code'] = 1
             item['source'] = response.url
-            item['org_id'] = "TG0024"
+            item['org_id'] = "TG0031"
 
             item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
             print item
