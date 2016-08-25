@@ -21,6 +21,8 @@ engine = create_engine('mysql+mysqldb://{}:{}@{}:3306/{}'.format(settings.MYSQL_
 redis_db4 = redis.Redis(host=settings.REDIS_HOST, port=6379, db=4, password=settings.REDIS_PWD)
 redis_fund_dict = "fund_uuids"
 
+mysql_table = "t_fund_nv_data"
+
 mutex = threading.Lock()
 
 class DuplicatePipeline(object):
@@ -30,7 +32,7 @@ class DuplicatePipeline(object):
 
     def __init__(self):
         if redis_db4.hlen(redis_fund_dict) == 0:
-            sql = "SELECT uuid FROM classifier_db.t_fund_nv_data"
+            sql = "SELECT uuid FROM {}".format(mysql_table)
             df = pd.read_sql(sql, engine)
             for uuid in df['uuid'].get_values():
                 redis_db4.hset(redis_fund_dict, uuid, 0)
@@ -51,15 +53,14 @@ class SetFundIDPipeline(object):
 
         if mutex.acquire(): # 互斥锁 加锁
 
-            table = "classifier_db.t_fund_nv_data"
-            sql = "select distinct fund_id from {} where fund_name='{}' ".format(table, item['fund_name'])
+            sql = "select distinct fund_id from {} where fund_name='{}' ".format(mysql_table, item['fund_name'])
             df = pd.read_sql(sql, engine)
             fund_ids = df['fund_id'].get_values()
             if len(fund_ids) and fund_ids[0]: # 数据库中存在fund_id, 直接赋值
                 item['fund_id'] = fund_ids[0]
             else:  # 数据库中不存在, 新建一个fund_id
                 sql = "SELECT distinct fund_id FROM {}  where org_id ='{}' order by length(fund_id) desc, fund_id desc".format(
-                    table, item['org_id']
+                    mysql_table, item['org_id']
                 )
                 df = pd.read_sql(sql, engine)
                 fund_ids = df['fund_id'].get_values()
@@ -94,7 +95,7 @@ class MySQLStorePipeline(object):
         # self.fund_items[spider.name].append(item)
         df = pd.DataFrame([item])
         print df
-        df.to_sql('t_fund_nv_data', engine, if_exists='append', index=False)
+        df.to_sql(mysql_table, engine, if_exists='append', index=False)
         redis_db4.hset(redis_fund_dict, item['uuid'], item['org_id'])
 
         return item

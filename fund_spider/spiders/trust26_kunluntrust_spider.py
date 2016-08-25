@@ -18,7 +18,7 @@ from fund_spider.items import FundSpiderItem
 from util.codeConvert import GetNowTime
 
 
-class TrustSxxtSpider(scrapy.Spider):
+class TrustKunlunSpider(scrapy.Spider):
     name = "trust26_kunluntrust_spider"
     allowed_domains = ["kunluntrust.com"]
 
