@@ -18,8 +18,8 @@ from fund_spider.items import FundSpiderItem
 from util.codeConvert import GetNowTime
 
 
-class TrustSxxtSpider(scrapy.Spider):
-    name = "trust25_huaao_spider"
+class TrustCqitiicSpider(scrapy.Spider):
+    name = "trust25_cqitic_spider"
     allowed_domains = ["cqitic.com"]
 
     start_urls = (

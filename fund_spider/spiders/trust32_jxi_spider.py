@@ -20,7 +20,7 @@ from util.codeConvert import GetNowTime
 from fund_spider.helper.parsepdf import parse_pdf
 
 
-class TrustSxxtSpider(scrapy.Spider):
+class TrustJxiSpider(scrapy.Spider):
     name = "trust32_jxi_spider"
     allowed_domains = ["jxi.cn"]
 

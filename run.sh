@@ -29,4 +29,6 @@ scrapy crawl trust28_zyxt_spider -s LOG_FILE=Log/trust28_zyxt_spider.log
 scrapy crawl trust31_zjtrust_spider -s LOG_FILE=Log/trust31_zjtrust_spider.log
 scrapy crawl trust32_jxi_spider -s LOG_FILE=Log/trust32_jxi_spider.log
 scrapy crawl trust39_nitic_spider -s LOG_FILE=Log/trust39_nitic_spider.log
+scrapy crawl trust42_gwxstrust_spider -s LOG_FILE=Log/trust42_gwxstrust_spider.log
+
 
