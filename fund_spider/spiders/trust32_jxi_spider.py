@@ -58,7 +58,7 @@ class TrustSxxtSpider(scrapy.Spider):
         total_page = max(page_list)
         for i in range(2, total_page + 1):
             href = "http://www.jxi.cn/News.aspx?hl=Ch&id=32&PageIndex={}".format(i)
-            # yield scrapy.Request(href, callback=self.parse_item)
+            yield scrapy.Request(href, callback=self.parse_item)
 
 
     def parse_item(self, response):
@@ -71,7 +71,6 @@ class TrustSxxtSpider(scrapy.Spider):
                 href = a['href']
                 href = href if 'http' in href else "http://www.jxi.cn" + href
                 yield scrapy.Request(href, callback=self.parse_history_link)
-
 
 
     # def parse_item_plus(self, response, item):
@@ -122,7 +121,12 @@ class TrustSxxtSpider(scrapy.Spider):
         if not os.path.exists(dir):
             os.makedirs(dir)
 
-        filename = dir + '/' + str(int(time.time()))+'.pdf'
+        suffixFind = re.search('/(\w+)/(\w+.pdf)', response.url)
+        if suffixFind:
+            filename = dir + '/' + suffixFind.group(1) + '-' + suffixFind.group(2)
+        else:
+            filename = hashlib.md5(response.url).hexdigest()
+
         f = open(filename , 'wb')
         f.write(response.body)
         f.close()
@@ -131,40 +135,46 @@ class TrustSxxtSpider(scrapy.Spider):
         content = '\n'.join(contents)
         contents = content.split('\n')
 
-        soup = bs(response.body, 'lxml')
-        trs = soup.find_all('tr')
-        first_col = '产品名称'
-        for tr in trs:
-            tds = tr.find_all('td')
-            if len(tds) not in (4,5):
-                continue
-            if '名称' in tds[0].text.strip() or '日期' in tds[0].text.strip():
-                first_col = tds[0].text.strip()
-                continue
+        names = []
+        foundation_dates = []
+        navs = []
+        statistic_date = None
+        for c in contents:
 
-            item = FundSpiderItem()
-            # item['fund_code'] = itemTop['fund_code']
-            if first_col != '日期':
-                item['fund_name'] = tds[0].text.strip()
-                item['fund_full_name'] = item['fund_name']
-                item['nav'] = tds[3].text.strip()
-                if len(tds) == 5:
-                    item['added_nav'] = tds[4].text.strip()
-                item['foundation_date'] = tds[1].text.strip()
-                item['statistic_date'] = tds[2].text.strip()
+            if '披露日' in c:
+                findDate = re.search(u"披露日：\s*(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})", c)
+                if findDate:
+                    statistic_date = "{}-{}-{}".format(findDate.group(1), findDate.group(2), findDate.group(3))
+            elif '信托业务' in c or '产品名称' in c or '成立' in c:
+                continue
+            elif '净值' in c or '估值' in c:
+                continue
+            elif '年' in c:
+                foundation_dates.append(c)
+            elif c.replace('.', '').isdigit():
+                navs.append(c)
             else:
-                item['fund_name'] = tds[1].text.strip()
+                names.append(c)
+
+        if len(names) == len(navs) and statistic_date:
+            for ix in range(len(names)):
+                item = FundSpiderItem()
+                item['fund_name'] = re.sub('\s','', names[ix])
                 item['fund_full_name'] = item['fund_name']
-                item['nav'] = tds[4].text.strip()
-                item['foundation_date'] = tds[2].text.strip()
-                item['statistic_date'] = tds[0].text.strip()
+                item['nav'] = navs[ix].strip()
+                item['statistic_date'] = statistic_date
 
-            item['entry_time'] = GetNowTime()
-            item['source_code'] = 1
-            item['source'] = response.url
-            item['org_id'] = "TG0024"
+                if len(foundation_dates) == len(navs):
+                    item['foundation_date'] = re.sub('\s','', foundation_dates[ix])
+                    item['foundation_date'] = item['foundation_date'].replace('年', '-').replace('月','-').replace('日','')
 
-            item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
-            print item
-            yield item
+                item['entry_time'] = GetNowTime()
+                item['source_code'] = 1
+                item['source'] = response.url
+                item['org_id'] = "TG0032"
+
+                item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
+                print item['fund_name']
+                print item
+                yield item
 

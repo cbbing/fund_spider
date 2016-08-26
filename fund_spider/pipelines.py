@@ -45,6 +45,23 @@ class DuplicatePipeline(object):
 
         return item
 
+class ValueVerificationPipeline(object):
+    """
+    有效性验证
+    """
+    def process_item(self, item, spider):
+        if not item['fund_name'] or not item['nav'] or not item['statistic_date']:
+            raise DropItem("Missing fund_name or nav or statistic_date in %s" % item)
+        elif item['statistic_date']:
+            dateFind = re.search('\d+.*?\d+.*?\d+', item['statistic_date'])
+            if not dateFind:
+                raise DropItem("statistic_date format not right! in %s" % item)
+        elif item['nav']:
+            if not item['nav'].replace('.', '').isdigit():
+                raise DropItem('nav is not float format! in %s' % item)
+
+        return item
+
 class SetFundIDPipeline(object):
     """
     设置fund_id字段
@@ -77,11 +94,6 @@ class SetFundIDPipeline(object):
 
             mutex.release()  # 互斥锁 释放
         return item
-
-
-
-
-
 
 
 class MySQLStorePipeline(object):

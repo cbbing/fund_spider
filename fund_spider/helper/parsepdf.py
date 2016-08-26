@@ -45,8 +45,8 @@ def parse_pdf(fname):
                 if(isinstance(x, LTTextBoxHorizontal)):
                     content = x.get_text().strip()
 
-                    print type(content)
-                    print content
+                    # print type(content)
+                    # print content
                     if content:
                         contents.append(content)
         return contents
