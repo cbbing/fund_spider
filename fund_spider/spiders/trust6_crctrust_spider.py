@@ -30,16 +30,19 @@ class TrustCrctrustSpider(scrapy.Spider):
     def start_requests(self):
         url = "http://www.crctrust.com/servlet/json"
         requests = []
-        formdata = {"funcNo": "904005",
-                    "page": '1',
-                    "numPerPage": "10",
-                    "type": "27",
-                    "name":"",
-                    "order":"sxrq",
-                    "sort":"asc"
-                   }
-        request = FormRequest(url, callback=self.parse, formdata=formdata)
-        requests.append(request)
+
+        # 开放式、组合、结构式、阳光私募
+        for type in [27, 30, 32, 31]:
+            formdata = {"funcNo": "904005",
+                        "page": '1',
+                        "numPerPage": "10",
+                        "type": str(type),
+                        "name":"",
+                        "order":"sxrq",
+                        "sort":"asc"
+                       }
+            request = FormRequest(url, callback=self.parse, formdata=formdata)
+            requests.append(request)
         return requests
 
 
@@ -105,12 +108,12 @@ class TrustCrctrustSpider(scrapy.Spider):
 
             item['uuid'] = hashlib.md5((item['fund_name']+item['statistic_date']).encode('utf8')).hexdigest()
             print item
-            yield item
+            # yield item
 
             # 历史净值
             formdata = {"funcNo": "904007",
                         "page": "1",
-                        "numPerPage": "20",
+                        "numPerPage": "40",
                         "jjdm":item['fund_code'],
                         "startTime": "",
                         "endTime": "",
@@ -128,7 +131,7 @@ class TrustCrctrustSpider(scrapy.Spider):
         # self.parse_history_nav(response, item)
         formdata = {"funcNo": "904007",
                    "page": "1",
-                   "numPerPage": "20",
+                   "numPerPage": "40",
                    "jjdm": item['fund_code'],
                    "startTime": "",
                    "endTime": "",
@@ -142,13 +145,13 @@ class TrustCrctrustSpider(scrapy.Spider):
         encodejson = json.loads(response.body, encoding='utf8')
         totalPages = encodejson['results'][0]['totalPages']
         for i in range(2, totalPages + 1):
-            formdata = {"funcNo": "904005",
+            formdata = {"funcNo": "904007",
                         "page": str(i),
-                        "numPerPage": "10",
-                        "type": "27",
-                        "name": "",
-                        "order": "sxrq",
-                        "sort": "asc"
+                        "numPerPage": "40",
+                        "jjdm": item['fund_code'],
+                        "startTime": "",
+                        "endTime": "",
+                        "order_by": "1",
                         }
             yield FormRequest(response.url, callback=lambda response, itemTop=item : self.parse_history_nav(response, itemTop),
                               formdata=formdata, dont_filter=True)
