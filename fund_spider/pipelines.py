@@ -53,7 +53,8 @@ class ValueVerificationPipeline(object):
         if not item['fund_name'] or not item['nav'] or not item['statistic_date']:
             raise DropItem("Missing fund_name or nav or statistic_date in %s" % item)
         elif item['statistic_date']:
-            dateFind = re.search('\d+.*?\d+.*?\d+', item['statistic_date'])
+            print item['statistic_date']
+            dateFind = re.search('\d{4}.*?\d{1,2}.*?\d{1,2}', item['statistic_date'])
             if not dateFind:
                 raise DropItem("statistic_date format not right! in %s" % item)
         elif item['nav']:
@@ -107,8 +108,11 @@ class MySQLStorePipeline(object):
         # self.fund_items[spider.name].append(item)
         df = pd.DataFrame([item])
         print df
-        df.to_sql(mysql_table, engine, if_exists='append', index=False)
-        redis_db4.hset(redis_fund_dict, item['uuid'], item['org_id'])
+        try:
+            df.to_sql(mysql_table, engine, if_exists='append', index=False)
+            redis_db4.hset(redis_fund_dict, item['uuid'], item['org_id'])
+        except Exception,e:
+            raise DropItem('insert to mysql error! %s, %s' % (item, e))
 
         return item
 

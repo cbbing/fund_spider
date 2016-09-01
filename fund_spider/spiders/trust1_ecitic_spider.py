@@ -18,8 +18,8 @@ from util.codeConvert import GetNowTime
 
 
 class TrustEciticSpider(scrapy.Spider):
-    name = "trust1_ecitic_spider"
-    # allowed_domains = ["trust.ecitic.com"]
+    name = "trust1_spider"
+    allowed_domains = ["ecitic.com"]
     start_urls = (
         'http://trust.ecitic.com/XXPL_JZPL/index.jsp?type=1',
     )
@@ -32,23 +32,20 @@ class TrustEciticSpider(scrapy.Spider):
         :return:
         """
         self.log(response.url)
-        # print response.url
 
         # 请求第一页
-        yield scrapy.Request(response.url, callback=self.parse_item)
+        yield scrapy.Request(response.url, callback=self.parse_item, dont_filter=True)
 
         # 请求其它页
-        for page in response.xpath('//div[@class="pagebar"]/a'):
-            link = page.xpath('@href').extract()[0]
-            if 'http' not in link:
-                link = "http://trust.ecitic.com/XXPL_JZPL/" + link
-
-            self.log(link)
-            print link
-            yield scrapy.Request(link, callback=self.parse_item)
+        for href in response.xpath('//a[contains(@href, "index.jsp?type=1&pageNum=")]/@href').extract():
+            href = "http://trust.ecitic.com/XXPL_JZPL/" + href
+            print href
+            # yield scrapy.Request(href, callback=self.parse_item)
 
 
     def parse_item(self, response):
+        self.log(response.url)
+
         soup = bs(response.body, 'lxml')
         trs = soup.find_all('tr')
         for tr in trs:
@@ -75,6 +72,7 @@ class TrustEciticSpider(scrapy.Spider):
 
             item['uuid'] = hashlib.md5((item['fund_name']+item['statistic_date']).encode('utf8')).hexdigest()
             print item
+            print item['fund_name']
             yield item
 
             # 产品详情
