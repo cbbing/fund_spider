@@ -113,7 +113,7 @@ class TrustCrctrustSpider(scrapy.Spider):
             # 历史净值
             formdata = {"funcNo": "904007",
                         "page": "1",
-                        "numPerPage": "40",
+                        "numPerPage": "20",
                         "jjdm":item['fund_code'],
                         "startTime": "",
                         "endTime": "",
@@ -131,7 +131,7 @@ class TrustCrctrustSpider(scrapy.Spider):
         # self.parse_history_nav(response, item)
         formdata = {"funcNo": "904007",
                    "page": "1",
-                   "numPerPage": "40",
+                   "numPerPage": "20",
                    "jjdm": item['fund_code'],
                    "startTime": "",
                    "endTime": "",
@@ -147,7 +147,7 @@ class TrustCrctrustSpider(scrapy.Spider):
         for i in range(2, totalPages + 1):
             formdata = {"funcNo": "904007",
                         "page": str(i),
-                        "numPerPage": "40",
+                        "numPerPage": "20",
                         "jjdm": item['fund_code'],
                         "startTime": "",
                         "endTime": "",
