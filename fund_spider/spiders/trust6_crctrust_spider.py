@@ -32,7 +32,7 @@ class TrustCrctrustSpider(scrapy.Spider):
         requests = []
 
         # 开放式、组合、结构式、阳光私募
-        for type in [27]: #, 30, 32, 31
+        for type in [27, 30, 32, 31]: #
             formdata = {"funcNo": "904005",
                         "page": '1',
                         "numPerPage": "10",
@@ -109,8 +109,6 @@ class TrustCrctrustSpider(scrapy.Spider):
             item['uuid'] = hashlib.md5((item['fund_name']+item['statistic_date']).encode('utf8')).hexdigest()
             print item
             # yield item
-            if item['fund_name'] != '华润信托·银帆6期集合资金信托计划':
-                continue
 
             # 历史净值
             formdata = {"funcNo": "904007",
