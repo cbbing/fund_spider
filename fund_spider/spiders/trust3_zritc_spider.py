@@ -14,11 +14,11 @@ import re
 import hashlib
 
 from fund_spider.items import FundSpiderItem
-from util.codeConvert import GetNowTime
+from util.date_convert import GetNowTime
 
 
 class TrustZritcSpider(scrapy.Spider):
-    name = "trust3_zritc_spider"
+    name = "trust3_spider"
     allowed_domains = ["zritc.com"]
     start_urls = ["http://www.zritc.com/InformationDisclosure/Index?pageIndex={}".format(i) for i in range(1, 17241)]
 

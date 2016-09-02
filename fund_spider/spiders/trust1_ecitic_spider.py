@@ -14,7 +14,7 @@ import re
 import hashlib
 
 from fund_spider.items import FundSpiderItem
-from util.codeConvert import GetNowTime
+from util.date_convert import GetNowTime
 
 
 class TrustEciticSpider(scrapy.Spider):

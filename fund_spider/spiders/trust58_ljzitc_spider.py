@@ -14,11 +14,11 @@ import hashlib
 # from webHelper import get_requests
 from scrapy.http import FormRequest
 from fund_spider.items import FundSpiderItem
-from util.codeConvert import GetNowTime
+from util.date_convert import GetNowTime
 from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
 from scrapy.contrib.spiders import CrawlSpider,Rule
 class TrustSxxtSpider(scrapy.Spider):
-    name = "trust58_ljzitc_spider"
+    name = "trust58_spider"
     allowed_domains = ["ljzitc.com.cn"]
 
     start_urls = (

@@ -17,11 +17,11 @@ from scrapy.http import FormRequest
 from scrapy import Selector
 
 from fund_spider.items import FundSpiderItem
-from util.codeConvert import GetNowTime
+from util.date_convert import GetNowTime
 
 
 class TrustDytrusteeSpider(scrapy.Spider):
-    name = "trust43_dytrustee_spider"
+    name = "trust43_spider"
     allowed_domains = ["dytrustee.com"]
 
     start_urls = (

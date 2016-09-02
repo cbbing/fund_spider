@@ -14,11 +14,11 @@ import re
 import hashlib
 
 from fund_spider.items import FundSpiderItem
-from util.codeConvert import GetNowTime
+from util.date_convert import GetNowTime
 
 
 class TrustSitiSpider(scrapy.Spider):
-    name = "trust5_siti_spider"
+    name = "trust5_spider"
     allowed_domains = ["siti.com.cn"]
     start_urls = ["http://www.siti.com.cn/product.php?fid=23&fup=3&pageid={}".format(i) for i in range(1, 7)]
 

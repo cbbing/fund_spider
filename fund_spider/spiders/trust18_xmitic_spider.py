@@ -14,11 +14,11 @@ import re
 import hashlib
 from scrapy.http import FormRequest
 from fund_spider.items import FundSpiderItem
-from util.codeConvert import GetNowTime
+from util.date_convert import GetNowTime
 
 
 class TrustXmitcSpider(scrapy.Spider):
-    name = "trust18_xmitic_spider"
+    name = "trust18_spider"
     allowed_domains = ["xmitic.com"]
 
     start_urls = (

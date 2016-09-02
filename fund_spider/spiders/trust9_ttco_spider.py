@@ -18,11 +18,11 @@ import scrapy
 from scrapy.http import FormRequest, HtmlResponse
 
 from fund_spider.items import FundSpiderItem
-from util.codeConvert import GetNowTime
+from util.date_convert import GetNowTime
 
 
 class TrustTtcoSpider(scrapy.Spider):
-    name = "trust9_ttco_spider"
+    name = "trust9_spider"
     allowed_domains = ["ttco.cn"]
 
     start_urls = (

@@ -15,11 +15,11 @@ import hashlib
 from scrapy.http import FormRequest
 
 from fund_spider.items import FundSpiderItem
-from util.codeConvert import GetNowTime
+from util.date_convert import GetNowTime
 
 
 class TrustKunlunSpider(scrapy.Spider):
-    name = "trust26_kunluntrust_spider"
+    name = "trust26_spider"
     allowed_domains = ["kunluntrust.com"]
 
     start_urls = (

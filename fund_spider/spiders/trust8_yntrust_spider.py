@@ -14,11 +14,11 @@ import re
 import hashlib
 
 from fund_spider.items import FundSpiderItem
-from util.codeConvert import GetNowTime
+from util.date_convert import GetNowTime
 
 
 class TrustYnTrustSpider(scrapy.Spider):
-    name = "trust8_yntrust_spider"
+    name = "trust8_spider"
     allowed_domains = ["yntrust.com"]
     start_urls = ["http://www.yntrust.com/index!netValue.xhtml?pager.offset=0&id="]
 

@@ -16,12 +16,12 @@ import time
 from scrapy.http import FormRequest
 
 from fund_spider.items import FundSpiderItem
-from util.codeConvert import GetNowTime
+from util.date_convert import GetNowTime
 from fund_spider.helper.parsepdf import parse_pdf
 
 
 class TrustJxiSpider(scrapy.Spider):
-    name = "trust32_jxi_spider"
+    name = "trust32_spider"
     allowed_domains = ["jxi.cn"]
 
     start_urls = (

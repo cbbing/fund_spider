@@ -13,11 +13,11 @@ import re,json
 import hashlib
 from scrapy.http import FormRequest
 from fund_spider.items import FundSpiderItem
-from util.codeConvert import GetNowTime
+from util.date_convert import GetNowTime
 from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
 from scrapy.contrib.spiders import CrawlSpider,Rule
 class TrustSxxtSpider(scrapy.Spider):
-    name = "trust57_jsitic_spider"
+    name = "trust57_spider"
     allowed_domains = ["jsitic.net"]
 
     start_urls = (

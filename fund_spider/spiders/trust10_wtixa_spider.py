@@ -14,11 +14,11 @@ import re
 import hashlib
 
 from fund_spider.items import FundSpiderItem
-from util.codeConvert import GetNowTime
+from util.date_convert import GetNowTime
 
 
 class TrustWtixaSpider(scrapy.Spider):
-    name = "trust10_wtixa_spider"
+    name = "trust10_spider"
     allowed_domains = ["wti-xa.com"]
     start_urls = [
         "http://www.wti-xa.com/gongsixinwen_single_jingzhi.jsp",

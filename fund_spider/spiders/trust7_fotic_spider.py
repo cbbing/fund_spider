@@ -16,11 +16,11 @@ import json
 from scrapy.http import FormRequest
 
 from fund_spider.items import FundSpiderItem
-from util.codeConvert import GetNowTime
+from util.date_convert import GetNowTime
 
 
 class TrustFoticSpider(scrapy.Spider):
-    name = "trust7_fotic_spider"
+    name = "trust7_spider"
     allowed_domains = ["fotic.com.cn"]
 
     # start_urls = (

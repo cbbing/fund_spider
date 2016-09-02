@@ -16,11 +16,11 @@ import hashlib
 from scrapy.http import FormRequest
 
 from fund_spider.items import FundSpiderItem
-from util.codeConvert import GetNowTime
+from util.date_convert import GetNowTime
 
 
 class TrustNiticSpider(scrapy.Spider):
-    name = "trust39_nitic_spider"
+    name = "trust39_spider"
     allowed_domains = ["nitic.cn"]
 
     start_urls = (

@@ -18,11 +18,11 @@ import scrapy
 from scrapy.http import FormRequest, HtmlResponse
 
 from fund_spider.items import FundSpiderItem
-from util.codeConvert import GetNowTime
+from util.date_convert import GetNowTime
 
 
 class TrustMinTrustSpider(scrapy.Spider):
-    name = "trust11_mintrust_spider"
+    name = "trust11_spider"
     allowed_domains = ["mintrust.com"]
 
     start_urls = (
