@@ -40,7 +40,7 @@ class TrustEciticSpider(scrapy.Spider):
         for href in response.xpath('//a[contains(@href, "index.jsp?type=1&pageNum=")]/@href').extract():
             href = "http://trust.ecitic.com/XXPL_JZPL/" + href
             print href
-            # yield scrapy.Request(href, callback=self.parse_item)
+            yield scrapy.Request(href, callback=self.parse_item)
 
 
     def parse_item(self, response):
