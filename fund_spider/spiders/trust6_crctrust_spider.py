@@ -20,7 +20,7 @@ from util.codeConvert import GetNowTime
 
 
 class TrustCrctrustSpider(scrapy.Spider):
-    name = "trust6_crctrust_spider"
+    name = "trust6_spider"
     allowed_domains = ["crctrust.com"]
 
     # start_urls = (
