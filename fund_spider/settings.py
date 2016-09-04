@@ -94,6 +94,7 @@ USER_AGENTS = [
 DOWNLOADER_MIDDLEWARES = {
     'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware' : None,
     'fund_spider.middlewares.RandomUserAgent.RandomUserAgent': 100,
+    #'fund_spider.middlewares.middleware.CustomMiddlewares': 200,
 }
 
 # Enable or disable extensions
@@ -105,7 +106,7 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'fund_spider.pipelines.DuplicatePipeline': 200,
+    # 'fund_spider.pipelines.DuplicatePipeline': 200,
     'fund_spider.pipelines.SetFundIDPipeline': 220,
     'fund_spider.pipelines.MySQLStorePipeline': 300,
 }
