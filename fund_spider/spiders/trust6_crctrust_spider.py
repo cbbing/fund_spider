@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 华润信托
+    开放式、组合、结构式、阳光私募
+    classify: 27, 30, 32, 31
 """
 
 import sys
@@ -23,6 +25,11 @@ class TrustCrctrustSpider(scrapy.Spider):
     name = "trust6_spider"
     allowed_domains = ["crctrust.com"]
 
+    def __init__(self, classify, *args, **kwargs):
+        super(TrustCrctrustSpider, self).__init__(*args, **kwargs)
+
+        self.classify  = str(classify)
+
     # start_urls = (
     #     'http://www.crctrust.com/servlet/json',
     # )
@@ -31,18 +38,17 @@ class TrustCrctrustSpider(scrapy.Spider):
         url = "http://www.crctrust.com/servlet/json"
         requests = []
 
-        # 开放式、组合、结构式、阳光私募
-        for type in [27, 30, 32, 31]: #
-            formdata = {"funcNo": "904005",
-                        "page": '1',
-                        "numPerPage": "10",
-                        "type": str(type),
-                        "name":"",
-                        "order":"sxrq",
-                        "sort":"asc"
-                       }
-            request = FormRequest(url, callback=self.parse, formdata=formdata)
-            requests.append(request)
+
+        formdata = {"funcNo": "904005",
+                    "page": '1',
+                    "numPerPage": "10",
+                    "type": self.classify,
+                    "name":"",
+                    "order":"sxrq",
+                    "sort":"asc"
+                   }
+        request = FormRequest(url, callback=self.parse, formdata=formdata)
+        requests.append(request)
         return requests
 
 
@@ -54,7 +60,7 @@ class TrustCrctrustSpider(scrapy.Spider):
         formdata = {"funcNo": "904005",
                     "page": '1',
                     "numPerPage": "10",
-                    "type": "27",
+                    "type": self.classify,
                     "name": "",
                     "order": "sxrq",
                     "sort": "asc"
@@ -70,7 +76,7 @@ class TrustCrctrustSpider(scrapy.Spider):
             formdata = {"funcNo": "904005",
                         "page": str(i),
                         "numPerPage": "10",
-                        "type": "27",
+                        "type": self.classify,
                         "name": "",
                         "order": "sxrq",
                         "sort": "asc"
@@ -107,7 +113,7 @@ class TrustCrctrustSpider(scrapy.Spider):
 
 
             item['uuid'] = hashlib.md5((item['fund_name']+item['statistic_date']).encode('utf8')).hexdigest()
-            print item
+            print item['fund_name']
             # yield item
 
             # 历史净值
