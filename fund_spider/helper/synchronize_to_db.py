@@ -23,12 +23,12 @@ redis_key_syn_dict = "fund_syn_to_fof_uuids"
 
 def synchronize_to_db():
 
-    for i in range(1, 23):
+    for i in range(1, 70):
         org_id = 'TG000{}'.format(i) if i < 10 else 'TG00{}'.format(i)
 
         # 源数据
         sql = "select uuid, org_id, fund_id, fund_name, fund_full_name, open_date, nav, added_nav, foundation_date, statistic_date, entry_time, " \
-              "source_code, source from classifier_db.t_fund_nv_data where org_id='{}' and syn_status=0".format(org_id)
+              "source_code, source from classifier_db.t_fund_nv_data where org_id='{}' ".format(org_id) #and syn_status=0
         datas = pd.read_sql(sql, engine_src, chunksize=1000)
 
 
@@ -38,7 +38,7 @@ def synchronize_to_db():
             print 'before len', len(df_origin)
             df = df_origin[df_origin['uuid'].apply(lambda x: not redis_db4.hexists(redis_key_syn_dict, x))]
             print 'after len', len(df)
-            del df['uuid']
+            # del df['uuid']
             print df.head()
             print df.columns
 
@@ -52,9 +52,9 @@ def synchronize_to_db():
             print 'update status to redis finish...'
 
             print 'update status begin...'
-            for uuid in uuids:
-                sql_u = "update classifier_db.t_fund_nv_data set syn_status=1 where uuid='{}' ".format(uuid)
-                engine_src.execute(sql_u)
+            # for uuid in uuids:
+            #     sql_u = "update classifier_db.t_fund_nv_data set syn_status=1 where uuid='{}' ".format(uuid)
+            #     engine_src.execute(sql_u)
             print 'update status finished'
 
         print 'syn {} finished! sleep 3 seconds'.format(org_id)
