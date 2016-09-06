@@ -6,16 +6,11 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import scrapy
-import requests
 from bs4 import BeautifulSoup
-from bs4 import BeautifulSoup as bs
 import re
 import hashlib
-from scrapy.http import FormRequest
 from fund_spider.items import FundSpiderItem
-from util.date_convert import GetNowTime
-from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
-from scrapy.contrib.spiders import CrawlSpider,Rule
+from util.codeConvert import GetNowTime
 class TrustSxxtSpider(scrapy.Spider):
     name = "trust54_spider"
     allowed_domains = ["cfitc.com"]
@@ -63,7 +58,7 @@ class TrustSxxtSpider(scrapy.Spider):
 
 
 
-    def parse_history_nav(self, response,Firstitem):
+    def parse_history_nav(self, response,firstitem):
         """
         历史净值
         :param response:
@@ -82,8 +77,8 @@ class TrustSxxtSpider(scrapy.Spider):
             # if "日期" == ps[0].text:
             #     continue
             item = FundSpiderItem()
-            item['fund_full_name'] = Firstitem['fund_full_name']
-            item['fund_name'] = item['fund_full_name']
+            item['fund_full_name'] = firstitem['fund_full_name']
+            item['fund_name'] = item['fund_full_name'].replace("净值公告","")
             item['statistic_date'] = ps[0].text.strip()
             item['nav'] = ps[1].text.strip()
             item['entry_time'] = GetNowTime()
