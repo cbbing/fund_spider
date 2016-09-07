@@ -6,16 +6,10 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import scrapy
-import requests
 from bs4 import BeautifulSoup
-from bs4 import BeautifulSoup as bs
-import re,json
 import hashlib
-from scrapy.http import FormRequest
 from fund_spider.items import FundSpiderItem
 from util.date_convert import GetNowTime
-from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
-from scrapy.contrib.spiders import CrawlSpider,Rule
 class TrustSxxtSpider(scrapy.Spider):
     name = "trust59_spider"
     allowed_domains = ["ajxt.com.cn"]
@@ -27,7 +21,6 @@ class TrustSxxtSpider(scrapy.Spider):
 
     def parse(self, response):
         self.log(response.url)
-        # html = requests.get(response.url)
         soup = BeautifulSoup(response.body, "lxml")
         trs = soup.find('div', {"class": "page"}).find_all("a")
         t = trs[8]['href']
@@ -46,27 +39,25 @@ class TrustSxxtSpider(scrapy.Spider):
         :return:
         """
         self.log(response.url)
-        # html = requests.get(response.url)
         soup = BeautifulSoup(response.body, "lxml")
         trs = soup.find_all('tr')
         for tr in trs:
             tds = tr.find_all('td')
             if len(tds)==3:
                 item = FundSpiderItem()
-                # if "2015" in tds[1].text.strip():
-                #     item['statistic_date'] = tds[1].text.strip()
-                #     item['nav'] = tds[2].text.strip()
-                # elif "2016" in tds[1].text.strip():
-                #     item['statistic_date'] = tds[1].text.strip()
-                #     item['nav'] = tds[2].text.strip()
-                # else:
-                item['nav'] = tds[1].text.strip()
+                if "2015" in tds[1].text.strip():
+                    item['statistic_date'] = tds[1].text.strip()
+                    item['nav'] = tds[2].text.strip()
+                elif "2016" in tds[1].text.strip():
+                    item['statistic_date'] = tds[1].text.strip()
+                    item['nav'] = tds[2].text.strip()
+                else:
+                    item['nav'] = tds[1].text.strip()
                 if tds[2].text.strip() is None:
                     item['statistic_date'] = None
                 else:
                     item['statistic_date'] =tds[2].text.strip()
                 item['fund_name'] = tds[0].text.strip()
-                item['fund_full_name'] = item['fund_name']
                 item['entry_time'] = GetNowTime()
                 item['source_code'] = 1
                 item['source'] = response.url

@@ -6,16 +6,11 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import scrapy
-import requests
 from bs4 import BeautifulSoup
-from bs4 import BeautifulSoup as bs
 import re,json
 import hashlib
-from scrapy.http import FormRequest
 from fund_spider.items import FundSpiderItem
 from util.date_convert import GetNowTime
-from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
-from scrapy.contrib.spiders import CrawlSpider,Rule
 class TrustSxxtSpider(scrapy.Spider):
     name = "trust66_spider"
     allowed_domains = ["msxt.com"]
@@ -27,7 +22,6 @@ class TrustSxxtSpider(scrapy.Spider):
 
     def parse(self, response):
         self.log(response.url)
-        # html = requests.get(response.url)
         soup = BeautifulSoup(response.body, "lxml")
         trs = soup.find('div', {"class":"ims_pager"})
         t = trs.text
@@ -41,7 +35,6 @@ class TrustSxxtSpider(scrapy.Spider):
         self.log(response.url)
         # 请求第一页
 
-        # html = requests.get(response.url)
         soup = BeautifulSoup(response.body, "lxml")
         trs = soup.find_all('td')
         for tr in trs:
@@ -51,10 +44,8 @@ class TrustSxxtSpider(scrapy.Spider):
                 urll= "http://www.msxt.com" + urls.a['href']
 
                 item['foundation_date'] = tr.next_sibling.next_sibling.text
-                item['open_date'] = tr.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.text
-                if item['open_date'] == '无':
-                    item['open_date'] = None
-                print item
+                item['open_date']=tr.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.text
+                # print item
                 # yield item
                 yield scrapy.Request(urll, callback=lambda response, item=item : self.parse_history_nav(response, item))
 
@@ -68,7 +59,6 @@ class TrustSxxtSpider(scrapy.Spider):
         :return:
         """
         self.log(response.url)
-        # html = requests.get(response.url)
         soup = BeautifulSoup(response.body, "lxml")
         trs = soup.find_all('tr')
         for tr in trs:

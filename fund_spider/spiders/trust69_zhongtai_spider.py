@@ -7,17 +7,10 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import scrapy
-import requests
 from bs4 import BeautifulSoup
-from bs4 import BeautifulSoup as bs
-import re
 import hashlib
-from scrapy.http import FormRequest
-
 from fund_spider.items import FundSpiderItem
 from util.date_convert import GetNowTime
-from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
-from scrapy.contrib.spiders import CrawlSpider,Rule
 class TrustSxxtSpider(scrapy.Spider):
     name = "trust69_spider"
     allowed_domains = ["zhongtaitrust.com"]
@@ -29,12 +22,11 @@ class TrustSxxtSpider(scrapy.Spider):
 
     def parse(self, response):
         self.log(response.url)
-        # html = requests.get(response.url)
         soup = BeautifulSoup(response.body, "lxml")
         trs = soup.find_all("td", colspan="3")
         tt = trs[1].find("tr").find("td")["class"]
         ts = filter(str.isdigit, tt[0])
-        for i in range(1,int(ts)):
+        for i in range(1,int(ts)+1):
             url = "http://www.zhongtaitrust.com/cn/fortune/products/jinzhi.jsp?pageIndex=%d"%i
             yield scrapy.Request(url, callback=self.parse_history_nav)
 
@@ -49,7 +41,6 @@ class TrustSxxtSpider(scrapy.Spider):
         """
         self.log(response.url)
 
-        # html = requests.get(response.url)
         soup = BeautifulSoup(response.body, "lxml")
         trs = soup.find_all('tr')
         for tr in trs:
