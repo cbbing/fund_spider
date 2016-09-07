@@ -77,7 +77,7 @@ class TrustSxxtSpider(scrapy.Spider):
             # if "日期" == ps[0].text:
             #     continue
             item = FundSpiderItem()
-            item['fund_name'] = item['fund_full_name'].replace("净值公告","")
+            item['fund_name'] = item['fund_name'].replace("净值公告","")
             item['fund_full_name'] = item['fund_name']
             item['statistic_date'] = ps[0].text.strip()
             item['nav'] = ps[1].text.strip()
