@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
-scrapy crawl trust1_ecitic_spider -s LOG_FILE=Log/trust1_ecitic_spider.log
+scrapy crawl trust1_spider -s LOG_FILE=Log/trust1_spider.log
 scrapy crawl trust2_huabao_spider -s LOG_FILE=Log/trust2_huabao_spider.log
 scrapy crawl trust3_zritc_spider -s LOG_FILE=Log/trust3_zritc_spider.log
 scrapy crawl trust4_sitic_spider -s LOG_FILE=Log/trust4_sitic_spider.log
 scrapy crawl trust5_siti_spider -s LOG_FILE=Log/trust5_siti_spider.log
-scrapy crawl trust6_crctrust_spider -s LOG_FILE=Log/trust6_crctrust_spider.log
+
+scrapy crawl trust6_spider -a classify=27 -s LOG_FILE=Log/trust6_spider.log
+scrapy crawl trust6_spider -a classify=30 -s LOG_FILE=Log/trust6_spider.log
+scrapy crawl trust6_spider -a classify=31 -s LOG_FILE=Log/trust6_spider.log
+scrapy crawl trust6_spider -a classify=32 -s LOG_FILE=Log/trust6_spider.log
+
 scrapy crawl trust7_fotic_spider -s LOG_FILE=Log/trust7_fotic_spider.log
 scrapy crawl trust8_yntrust_spider -s LOG_FILE=Log/trust8_yntrust_spider.log
 scrapy crawl trust9_ttco_spider -s LOG_FILE=Log/trust9_ttco_spider.log
