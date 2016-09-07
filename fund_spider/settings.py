@@ -107,6 +107,7 @@ DOWNLOADER_MIDDLEWARES = {
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     # 'fund_spider.pipelines.DuplicatePipeline': 200,
+    'fund_spider.pipelines.ValueVerificationPipeline': 210,
     'fund_spider.pipelines.SetFundIDPipeline': 220,
     'fund_spider.pipelines.MySQLStorePipeline': 300,
 }
