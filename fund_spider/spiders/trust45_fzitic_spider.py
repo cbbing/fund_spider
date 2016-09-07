@@ -50,16 +50,41 @@ class TrustSxxtSpider(scrapy.Spider):
         """
         self.log(response.url)
         soup = BeautifulSoup(response.body, "lxml")
-        divs= soup.find('div',{"class":"right_title"})
         trs = soup.find_all('tr')
         for tr in trs:
             tds = tr.find_all('td')
-            if len(tds)==2 and tds[0].p.text!="估值日":
+            if tds[0].p:
+                if tds[0].p.text.strip()!= "估值日" and tds[0].p.text.strip()!= "估值时间":
+                    item = FundSpiderItem()
+                    if tds[0].p:
+                        item['statistic_date'] = tds[0].p.text.strip()
+                    else:
+                        item['statistic_date'] = tds[0].text.strip()
+                    if tds[1].p:
+                        item['nav'] = tds[1].p.text.strip()
+                    else:
+                        item['nav'] = tds[1].text.strip()
+                    item['fund_name'] = soup.find("h3").text
+                    item['fund_full_name'] = item['fund_name']
+                    item['entry_time'] = GetNowTime()
+                    item['source_code'] = 1
+                    item['source'] = response.url
+                    item['org_id'] = "TG0045"
+                    item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
+                    print item
+                    yield item
+            else:
                 item = FundSpiderItem()
-                item['fund_name'] =soup.find("h3").text
-                item['fund_full_name'] =item['fund_name']
-                item['nav'] = tds[1].p.text.strip()
-                item['statistic_date'] = tds[0].p.text.strip()
+                if tds[0].p:
+                    item['statistic_date'] = tds[0].p.text.strip()
+                else:
+                    item['statistic_date'] = tds[0].text.strip()
+                if tds[1].p:
+                    item['nav'] = tds[1].p.text.strip()
+                else:
+                    item['nav'] = tds[1].text.strip()
+                item['fund_name'] = soup.find("h3").text
+                item['fund_full_name'] = item['fund_name']
                 item['entry_time'] = GetNowTime()
                 item['source_code'] = 1
                 item['source'] = response.url
@@ -67,3 +92,17 @@ class TrustSxxtSpider(scrapy.Spider):
                 item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
                 print item
                 yield item
+
+            # if len(tds)==2 and tds[0].p.text.strip()!="估值日":
+            #     item = FundSpiderItem()
+            #     item['fund_name'] =soup.find("h3").text
+            #     item['fund_full_name'] =item['fund_name']
+            #     item['nav'] = tds[1].p.text.strip()
+            #     item['statistic_date'] = tds[0].p.text.strip()
+            #     item['entry_time'] = GetNowTime()
+            #     item['source_code'] = 1
+            #     item['source'] = response.url
+            #     item['org_id'] = "TG0045"
+            #     item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
+            #     print item
+            #     yield item

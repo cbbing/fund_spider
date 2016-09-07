@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 import re
 import hashlib
 from fund_spider.items import FundSpiderItem
-from util.codeConvert import GetNowTime
+from util.date_convert import GetNowTime
 class TrustSxxtSpider(scrapy.Spider):
     name = "trust46_spider"
     allowed_domains = ["gstrust.com.cn"]

@@ -1,4 +1,4 @@
-trust54_cfitc_spider.py# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 国民信托
 """
@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 import re,json
 import hashlib
 from fund_spider.items import FundSpiderItem
-from util.codeConvert import GetNowTime
+from util.date_convert import GetNowTime
 class TrustSxxtSpider(scrapy.Spider):
     name = "trust48_spider"
     allowed_domains = ["natrust.cn"]
@@ -55,7 +55,8 @@ class TrustSxxtSpider(scrapy.Spider):
             tds = tr.find_all('td')
             if len(tds) == 4 and tds[0].text.strip() != "日期":
                 item = FundSpiderItem()
-                item['fund_name'] =soup.find("div",{"class":"left"}).text.strip().replace("国民信托·","").replace("集合资金信托计划","")
+                item['fund_name'] =soup.find("div",{"class":"left"}).text.strip().replace("国民信托·","")\
+                                    .replace("证券投资集合资金信托计划","").replace("集合资金信托计划","")
                 item['fund_full_name'] = soup.find("div",{"class":"left"}).text.strip()
                 item['nav'] = tds[1].text.strip()
                 item['added_nav']=tds[2].text.strip()
