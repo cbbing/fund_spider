@@ -56,6 +56,10 @@ class TrustSxxtSpider(scrapy.Spider):
         soup = BeautifulSoup(response.body, "lxml")
 
         trs = soup.find_all('tr')
+
+        isDateStart = False
+        title = ''
+
         for tr in trs:
             tds = tr.find_all('td')
             if len(tds)==5:
@@ -80,25 +84,30 @@ class TrustSxxtSpider(scrapy.Spider):
                 print item
                 yield item
             elif len(tds) == 3:
-                pass
-                # http://www.ccbtrust.com.cn/templates/second/index.aspx?nodeid=16&page=ContentPage&contentid=9075
-                # http://www.ccbtrust.com.cn/templates/second/index.aspx?nodeid=16&page=ContentPage&contentid=9074
-                # if "产品名称" == tds[0].text.strip():
-                #     continue
-                # item = FundSpiderItem()
-                # item['fund_name'] = tds[0].text.strip()
-                # item['fund_full_name'] = item['fund_name']
-                # if '成立日' in tds[1].text:
-                #     print tds[1].text
-                # item['statistic_date'] = tds[1].text.replace('成立日', '').replace("(", '').replace(")", "") \
-                #     .replace("（", '').replace("）", "") \
-                #     .strip()
-                # item['nav'] = tds[2].text.strip()
-                #
-                # item['entry_time'] = GetNowTime()
-                # item['source_code'] = 1
-                # item['source'] = response.url
-                # item['org_id'] = "TG0056"
-                # item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
-                # print item
-                # # yield item
+                if "日期" == tds[0].text.strip():
+                    isDateStart = True
+                    title = soup.find('h2').text.replace("计划收益",'')
+                    continue
+                item = FundSpiderItem()
+                if isDateStart:
+                    # http://www.ccbtrust.com.cn/templates/second/index.aspx?nodeid=16&page=ContentPage&contentid=9074
+                    item['fund_name'] = title
+                    item['fund_full_name'] = item['fund_name']
+                    item['statistic_date'] = tds[0].text
+                    item['nav'] = tds[1].text.strip()
+                else:
+                    # http://www.ccbtrust.com.cn/templates/second/index.aspx?nodeid=16&page=ContentPage&contentid=9075
+                    item['fund_name'] = tds[0].text.strip()
+                    item['fund_full_name'] = item['fund_name']
+                    item['statistic_date'] = tds[1].text
+                    item['nav'] = tds[2].text.strip()
+
+                item['statistic_date'] = item['statistic_date'].replace('成立日', '').replace("(", '').replace(")", "") \
+                    .replace("（", '').replace("）", "").strip()
+                item['entry_time'] = GetNowTime()
+                item['source_code'] = 1
+                item['source'] = response.url
+                item['org_id'] = "TG0056"
+                item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
+                print item
+                yield item
