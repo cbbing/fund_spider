@@ -8,8 +8,11 @@ sys.setdefaultencoding('utf-8')
 import scrapy
 from bs4 import BeautifulSoup
 import hashlib
+import re
 from fund_spider.items import FundSpiderItem
 from util.date_convert import GetNowTime
+from scrapy.http import TextResponse
+
 class TrustSxxtSpider(scrapy.Spider):
     name = "trust59_spider"
     allowed_domains = ["ajxt.com.cn"]
@@ -39,7 +42,14 @@ class TrustSxxtSpider(scrapy.Spider):
         :return:
         """
         self.log(response.url)
-        soup = BeautifulSoup(response.body, "lxml")
+
+        # 根据网页字符编码设置字符编码格式
+        f = re.search('charset=([\w-]+)', response.body)
+        if f:
+            encode = f.group(1)
+            response._encoding = encode
+
+        soup = BeautifulSoup(response.text, "lxml")
         trs = soup.find_all('tr')
         for tr in trs:
             tds = tr.find_all('td')
@@ -58,10 +68,12 @@ class TrustSxxtSpider(scrapy.Spider):
                 else:
                     item['statistic_date'] =tds[2].text.strip()
                 item['fund_name'] = tds[0].text.strip()
+                item['fund_full_name'] = item['fund_name']
                 item['entry_time'] = GetNowTime()
                 item['source_code'] = 1
                 item['source'] = response.url
                 item['org_id'] = "TG0059"
                 item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
                 print item
+                print item['fund_name']
                 yield item

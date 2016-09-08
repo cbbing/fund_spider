@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 scrapy crawl trust1_spider -s LOG_FILE=Log/trust1_spider.log
 scrapy crawl trust2_spider -s LOG_FILE=Log/trust2_spider.log
 scrapy crawl trust3_spider -s LOG_FILE=Log/trust3_spider.log
