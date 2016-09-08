@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-陆家嘴信托
+江苏信托
 """
 import sys
 reload(sys)
