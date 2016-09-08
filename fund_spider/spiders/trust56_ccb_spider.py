@@ -16,7 +16,7 @@ class TrustSxxtSpider(scrapy.Spider):
     allowed_domains = ["ccbtrust.com.cn"]
 
     start_urls = (
-        'http://www.ccbtrust.com.cn/templates/second/index.aspx?nodeid=16',
+        'http://www.ccbtrust.com.cn/templates/second/index.aspx?nodeid=16&pagesize=1&pagenum=100',
     )
 
 
@@ -28,8 +28,9 @@ class TrustSxxtSpider(scrapy.Spider):
         tt = re.compile(r"\d+")
         page_totle=tt.findall(t)[0]
         for page in range(1,int(page_totle)+1):
-            url='http://www.ccbtrust.com.cn/templates/second/index.aspx?nodeid=16&pagesize=%d&pagenum=10'%page
-            yield scrapy.Request(url, callback=self.parse_two)
+            url='http://www.ccbtrust.com.cn/templates/second/index.aspx?nodeid=16&pagesize=%d&pagenum=100'%page
+            yield scrapy.Request(url, callback=self.parse_two, dont_filter=True)
+
 
 
     def parse_two(self,response):
@@ -43,6 +44,7 @@ class TrustSxxtSpider(scrapy.Spider):
                 url = lis[0].a['href']
                 yield scrapy.Request(url,callback=self.parse_history_nav)
 
+
     def parse_history_nav(self, response):
         """
         历史净值
@@ -55,15 +57,21 @@ class TrustSxxtSpider(scrapy.Spider):
 
         trs = soup.find_all('tr')
         for tr in trs:
-            ps = tr.find_all('p')
-            if len(ps)==3:
-                if "产品名称" == ps[0].font.text:
+            tds = tr.find_all('td')
+            if len(tds)==5:
+                # http://www.ccbtrust.com.cn/templates/second/index.aspx?nodeid=16&page=ContentPage&contentid=9084
+                if "产品名称" == tds[0].text.strip():
                     continue
                 item = FundSpiderItem()
-                item['fund_full_name'] = ps[0].font.text.strip()
-                item['fund_name'] = ps[0].font.text.strip()
-                item['statistic_date'] = ps[1].font.text.strip()
-                item['nav'] = ps[2].font.text.strip()
+                item['fund_name'] = tds[0].text.strip()
+                item['fund_full_name'] = item['fund_name']
+                if '成立日' in tds[1].text:
+                    print tds[1].text
+                item['statistic_date'] = tds[1].text.replace('成立日','').replace("(",'').replace(")","") \
+                    .replace("（", '').replace("）", "")                                    \
+                    .strip()
+                item['nav'] = tds[2].text.strip()
+
                 item['entry_time'] = GetNowTime()
                 item['source_code'] = 1
                 item['source'] = response.url
@@ -71,3 +79,26 @@ class TrustSxxtSpider(scrapy.Spider):
                 item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
                 print item
                 yield item
+            elif len(tds) == 3:
+                pass
+                # http://www.ccbtrust.com.cn/templates/second/index.aspx?nodeid=16&page=ContentPage&contentid=9075
+                # http://www.ccbtrust.com.cn/templates/second/index.aspx?nodeid=16&page=ContentPage&contentid=9074
+                # if "产品名称" == tds[0].text.strip():
+                #     continue
+                # item = FundSpiderItem()
+                # item['fund_name'] = tds[0].text.strip()
+                # item['fund_full_name'] = item['fund_name']
+                # if '成立日' in tds[1].text:
+                #     print tds[1].text
+                # item['statistic_date'] = tds[1].text.replace('成立日', '').replace("(", '').replace(")", "") \
+                #     .replace("（", '').replace("）", "") \
+                #     .strip()
+                # item['nav'] = tds[2].text.strip()
+                #
+                # item['entry_time'] = GetNowTime()
+                # item['source_code'] = 1
+                # item['source'] = response.url
+                # item['org_id'] = "TG0056"
+                # item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
+                # print item
+                # # yield item
