@@ -28,34 +28,37 @@ def synchronize_to_db():
 
         # 源数据
         sql = "select uuid, org_id, fund_id, fund_name, fund_full_name, open_date, nav, added_nav, foundation_date, statistic_date, entry_time, " \
-              "source_code, source from classifier_db.t_fund_nv_data where org_id='{}' ".format(org_id) #and syn_status=0
+              "source_code, source from classifier_db.t_fund_nv_data where org_id='{}' and syn_status=0 ".format(org_id) #and syn_status=0
         datas = pd.read_sql(sql, engine_src, chunksize=1000)
 
 
         for df_origin in datas:
+            if len(df_origin) == 0:
+                continue
+
             uuids = df_origin['uuid'].get_values()
 
-            print 'before len', len(df_origin)
+            print org_id, 'before len', len(df_origin)
             df = df_origin[df_origin['uuid'].apply(lambda x: not redis_db4.hexists(redis_key_syn_dict, x))]
-            print 'after len', len(df)
+            print org_id,  'after len', len(df)
             # del df['uuid']
-            print df.head()
-            print df.columns
+            print df.head(1)
+            # print df.columns
 
-            print 'save to db begin...'
+            print org_id, 'save to db begin...'
             df.to_sql("t_fund_nv_data", engine_obj, if_exists='append', index=False)
-            print 'save to db finish...'
+            print org_id, 'save to db finish...'
 
-            print 'update status to redis begin...'
+            print org_id,  'update status to redis begin...'
             for uuid in uuids:
                 redis_db4.hset(redis_key_syn_dict, uuid, 0)
-            print 'update status to redis finish...'
+            print org_id, 'update status to redis finish...'
 
-            print 'update status begin...'
-            # for uuid in uuids:
-            #     sql_u = "update classifier_db.t_fund_nv_data set syn_status=1 where uuid='{}' ".format(uuid)
-            #     engine_src.execute(sql_u)
-            print 'update status finished'
+            print org_id,  'update status begin...'
+            for uuid in uuids:
+                sql_u = "update classifier_db.t_fund_nv_data set syn_status=1 where uuid='{}' ".format(uuid)
+                engine_src.execute(sql_u)
+            print org_id, 'update status finished'
 
         print 'syn {} finished! sleep 3 seconds'.format(org_id)
         time.sleep(3)
