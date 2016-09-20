@@ -27,3 +27,8 @@ class FundSpiderItem(scrapy.Item):
 
     # def __unicode__(self):
     #     return self.fund_name+","+self.foundation_date
+    def __str__(self):
+        values = ''
+        for key in self.iterkeys():
+            values += key + ":" + self[key] + "\n"
+        return values
