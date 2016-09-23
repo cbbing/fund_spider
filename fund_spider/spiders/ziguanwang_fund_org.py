@@ -105,11 +105,6 @@ class TrustSxxtSpider(scrapy.Spider):
             url = "http://www.ziguan123.com" + d['href']
             yield scrapy.Request(url, callback=lambda response, item=item : self.parse_detail_plus(response, item))
 
-            rs = requests.get(url)
-            soup = BeautifulSoup(rs.text, "lxml")
-            rd = soup.find("p", {"class": "padding20 lineh28"})
-            item['profile'] = rd.text
-
         else:
             print item
             yield item
