@@ -49,6 +49,12 @@ class FundNvDataItem(scrapy.Item):
     data_source = scrapy.Field()
     data_source_name = scrapy.Field()
 
+    def __str__(self):
+        values = ''
+        for key in self.iterkeys():
+            values += "{}:{}\n".format(key, self[key])
+        return values
+
 class FundSecurityDataItem(scrapy.Item):
     fund_id=scrapy.Field()
     fund_name=scrapy.Field()
@@ -61,6 +67,13 @@ class FundSecurityDataItem(scrapy.Item):
     data_source_name=scrapy.Field()
     entry_time=scrapy.Field()
 
+    def __str__(self):
+        values = ''
+        for key in self.iterkeys():
+            values += "{}:{}\n".format(key, self[key])
+        return values
+
+
 class FundAllocationItem(scrapy.Item):
     fund_id = scrapy.Field()
     fund_name = scrapy.Field()
@@ -71,6 +84,12 @@ class FundAllocationItem(scrapy.Item):
     data_source = scrapy.Field()
     data_source_name = scrapy.Field()
     entry_time = scrapy.Field()
+
+    def __str__(self):
+        values = ''
+        for key in self.iterkeys():
+            values += "{}:{}\n".format(key, self[key])
+        return values
 
 class FundInfoItem(scrapy.Item):
     uuid = scrapy.Field()
@@ -113,6 +132,12 @@ class FundInfoItem(scrapy.Item):
     redeem_data_remark = scrapy.Field()
     redeem_account_remark = scrapy.Field()
 
+    def __str__(self):
+        values = ''
+        for key in self.iterkeys():
+            values += "{}:{}\n".format(key, self[key])
+        return values
+
 class FundPersonItem(scrapy.Item):
     uuid = scrapy.Field()
     user_id=scrapy.Field()
@@ -130,6 +155,13 @@ class FundPersonItem(scrapy.Item):
     graduateschool=scrapy.Field()
     org_name_before=scrapy.Field()
 
+    fund_id = scrapy.Field()
+
+    def __str__(self):
+        values = ''
+        for key in self.iterkeys():
+            values += "{}:{}\n".format(key, self[key])
+        return values
 
 class FundOrgItem(scrapy.Item):
     uuid = scrapy.Field()

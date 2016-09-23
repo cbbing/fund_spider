@@ -19,7 +19,7 @@ import requests,json
 from util.date_convert import GetNowTime
 
 class TrustSxxtSpider(scrapy.Spider):
-    name = "d_fund_org_spider"
+    name = "ziguan_fund_org_spider"
     allowed_domains = ["ziguan123.com"]
 
     # start_urls = (

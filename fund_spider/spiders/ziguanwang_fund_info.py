@@ -5,14 +5,13 @@ sys.setdefaultencoding('utf-8')
 import scrapy
 from bs4 import BeautifulSoup
 import hashlib
-import datetime
 
-from fund_spider.items import FundNvDataItem
+from fund_spider.items import FundInfoItem
 from scrapy.http import  FormRequest
 import requests,json
 from util.date_convert import GetNowTime
 class TrustSxxtSpider(scrapy.Spider):
-    name = "ziguan_fund_nv_data_spider"
+    name = "ziguan_fund_info_spider"
     allowed_domains = ["ziguan123.com"]
 
     def start_requests(self):
@@ -37,9 +36,7 @@ class TrustSxxtSpider(scrapy.Spider):
 
     def parse(self, response):
         self.log(response.url)
-
         t = json.loads(response.body)
-        #li = t['rawdata']['data']
         pages = t['rawdata']['data'][0]['operator_type']
         for i in range(1, int(pages) + 1):
             data = {  # 表单
@@ -81,45 +78,57 @@ class TrustSxxtSpider(scrapy.Spider):
 
     def parse_detail(self, response):
         self.log(response.url)
+        item = FundInfoItem()
         soup = BeautifulSoup(response.body, "lxml")
         title = soup.find("h1", {"class": "cp-title"})
         if title:
-            print title.text
-            print response.url
             num = response.url.replace("http://www.ziguan123.com/product/detail/", "")
+        ss = soup.find("li", {"class": "li_onfor_01"})
+        t = ss.text.split()[1]
+        fund_status = t.replace("运行状态：", "")
+        item['fund_id'] = num
+        item['fund_name'] = title.text
+        item['fund_full_name'] = title.text
+        item['fund_status'] = fund_status
+        rs = soup.find("table", {"class": "tablebor_xy table_td_w25p "})
+        trs = rs.find_all("tr")
+        tds = trs[1].find_all("td")
+        item['fund_manager'] = tds[1].text.strip()
+        item['fund_member'] = tds[3].text.strip()
 
-            item = FundNvDataItem()
+        tds = trs[2].find_all("td")
+        item['fund_type_issuance'] = tds[1].text.strip()
+        item['foundation_date'] = tds[3].text.strip()
 
-            url = "http://www.ziguan123.com/product/ajaxlinechart"
-            data = {  # 表单
-                "productid": num,
-            }
-            yield scrapy.FormRequest(url, formdata=data,
-                                     callback=lambda response, title=title, num=num : self.parse_detail_nav(response, title, num))
+        tds = trs[3].find_all("td")
+        item['duration'] = tds[3].text.strip().replace("--", "")
+
+        tds = trs[4].find_all("td")
+        item['fund_stockbroker'] = tds[1].text.strip().replace("--", "")
+        item['fund_custodian'] = tds[3].text.strip().replace("--", "")
+
+        tds = trs[5].find_all("td")
+        item['min_purchase_amount'] = tds[1].text.strip()
+        item['init_total_asset'] = tds[3].text.strip()
+
+        tds = trs[6].find_all("td")
+        item['locked_time_limit'] = tds[1].text.strip().replace("--", "")
+        item['open_date'] = tds[3].text.strip().replace("--", "")
+
+        tds = trs[7].find_all("td")
+        item['fee_subscription'] = tds[1].text.strip().replace("--", "")
+        item['fee_redeem'] = tds[3].text.strip().replace("--", "")
+
+        tds = trs[8].find_all("td")
+        item['fee_manage'] = tds[1].text.strip().replace("--", "")
+        item['fee_pay'] = tds[3].text.strip().replace("--", "")
+        item['type_name'] = "CTA策略|股票对冲|组合基金|全球宏观|债券策略"
+        item['entry_time'] = GetNowTime()
+        item['uuid'] = hashlib.md5((item['fund_name'] + item['fund_id']).encode('utf8')).hexdigest()
+        print item
+        yield item
 
 
-    def parse_detail_nav(self, response, title):
-        print response.url
-        soup = BeautifulSoup(response.text, "lxml")
-        tt = json.loads(soup.text)
-        for i in tt['data']:
-            item = FundNvDataItem()
-            # 将时间撮换为标准时间
-            timeStamp = int(i['valuedate']) / 1000
-            dateArray = datetime.datetime.utcfromtimestamp(timeStamp)
-            otherStyleTime = dateArray.strftime("%Y-%m-%d")
-            item['fund_name'] = title.text
-            item['fund_full_name'] = title.text
-            item['fund_id'] = num
-            item['nav'] = i['netunit']
-            item['swanav'] = i['totalnet']
-            item['statistic_date'] = otherStyleTime
-            item['entry_time'] = GetNowTime()
-            item['source_code'] = "3-第三方"
-            item['data_source'] = 6
-            item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
-            print item
-            yield item
 
 
 
