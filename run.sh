@@ -50,5 +50,10 @@ scrapy crawl trust65_spider -s LOG_FILE=Log/trust65_spider.log
 scrapy crawl trust66_spider -s LOG_FILE=Log/trust66_spider.log
 scrapy crawl trust69_spider -s LOG_FILE=Log/trust69_spider.log
 
+scrapy crawl ziguan_fund_nv_data_spider -s LOG_FILE=Log/ziguan_fund_nv_data_spider.log
+scrapy crawl ziguan_fund_info_spider -s LOG_FILE=Log/ziguan_fund_info_spider.log
+scrapy crawl ziguan_fund_person_spider -s LOG_FILE=Log/ziguan_fund_person_spider.log
+scrapy crawl ziguan_fund_org_spider -s LOG_FILE=Log/ziguan_fund_org_spider.log
+
 
 

@@ -5,14 +5,12 @@ sys.setdefaultencoding('utf-8')
 import scrapy
 from bs4 import BeautifulSoup
 import hashlib
-import datetime
-
-from fund_spider.items import FundNvDataItem
+from fund_spider.items import FundPersonItem
 from scrapy.http import  FormRequest
-import requests,json
+import json
 from util.date_convert import GetNowTime
 class TrustSxxtSpider(scrapy.Spider):
-    name = "ziguan_fund_nv_data_spider"
+    name = "ziguan_fund_person_spider"
     allowed_domains = ["ziguan123.com"]
 
     def start_requests(self):
@@ -37,9 +35,7 @@ class TrustSxxtSpider(scrapy.Spider):
 
     def parse(self, response):
         self.log(response.url)
-
         t = json.loads(response.body)
-        #li = t['rawdata']['data']
         pages = t['rawdata']['data'][0]['operator_type']
         for i in range(1, int(pages) + 1):
             data = {  # 表单
@@ -59,7 +55,6 @@ class TrustSxxtSpider(scrapy.Spider):
 
     def parse_item(self, response):
         print response.url
-
         t = json.loads(response.body)
         datas = t['rawdata']['data']
         for data in datas:
@@ -77,51 +72,39 @@ class TrustSxxtSpider(scrapy.Spider):
                 yield scrapy.Request(urll, callback=self.parse_detail,dont_filter=True)
 
         else:
-            yield scrapy.Request(response.url, callback=self.parse_detail,dont_filter=True)
+            yield scrapy.Request(response.url, callback=self.parse_detail, dont_filter=True)
+
 
     def parse_detail(self, response):
         self.log(response.url)
+        item = FundPersonItem()
         soup = BeautifulSoup(response.body, "lxml")
         title = soup.find("h1", {"class": "cp-title"})
         if title:
-            item = FundNvDataItem()
-            print title.text
-            print response.url
             num = response.url.replace("http://www.ziguan123.com/product/detail/", "")
-            urll = "http://www.ziguan123.com/product/ajaxlinechart"
-            data = {  # 表单
-                "productid": num,
-            }
-            item['fund_name'] = title.text
-            item['fund_full_name'] = title.text
-            item['fund_id'] = num
-            #t = requests.post(url, data=data)  # 向服务器发送post请求
-            yield scrapy.FormRequest(urll, callback=lambda response, item=item : self.parse_history_link(response,item),formdata=data, dont_filter=True)
+        rs = soup.find("table", {"class": "tablebor_xy table_td_w25p "})
+        trs = rs.find_all("tr")
+        tds = trs[1].find_all("td")
+        d = soup.find("div", {"class": "swiper-slide jjjlbox "})
+        if len(d.text.strip()) == 0:
+            item['resume'] = d.text.strip()
+        if len(d.text.strip().split()) == 1:
+            item['resume'] = "None"
+        if len(d.text.strip().split()) == 2:
+            item['resume'] = d.text.strip().split()[1]
+        item['user_name'] = tds[3].text.strip().replace('--', '')
+        if len(item['user_name']) == 0:
+            return
 
+        item['user_id'] = num
 
-    def parse_history_link(self, response,Item):
-        soup = BeautifulSoup(response.body, "lxml")
-        tt = json.loads(soup.text)
-        for i in tt['data']:
-            item = FundNvDataItem()
-            # 将时间撮换为标准时间
-            timeStamp = int(i['valuedate']) / 1000
-            dateArray = datetime.datetime.utcfromtimestamp(timeStamp)
-            otherStyleTime = dateArray.strftime("%Y-%m-%d")
-            item['fund_name'] = Item['fund_name']
-            item['fund_full_name'] = Item['fund_full_name']
-            item['fund_id'] =Item['fund_id']
-            item['nav'] = i['netunit']
-            item['swanav'] = i['totalnet']
-            item['statistic_date'] = otherStyleTime
-            item['entry_time'] = GetNowTime()
-            item['source_code'] = 3
-            item['data_source'] = 6
-            item['data_source_name'] = '期货资管网'
-            item['uuid'] = hashlib.md5((item['fund_name'] + item['statistic_date']).encode('utf8')).hexdigest()
-            print item
-            yield item
+        item['entry_time'] = GetNowTime()
+        item['data_source'] = 6
+        item['data_source_name'] = '期货资管网'
 
+        item['uuid'] = hashlib.md5((item['user_name'] + item['user_id']).encode('utf8')).hexdigest()
+        print item
+        yield item
 
 
 

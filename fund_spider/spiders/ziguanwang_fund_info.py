@@ -52,7 +52,7 @@ class TrustSxxtSpider(scrapy.Spider):
                 "page_size": "40"
             }
             yield scrapy.FormRequest(response.url, formdata=data, callback=self.parse_item, dont_filter=True)
-            break
+
 
     def parse_item(self, response):
         print response.url
@@ -62,7 +62,7 @@ class TrustSxxtSpider(scrapy.Spider):
         for data in datas:
             url = "http://www.ziguan123.com/product/detail/" + data['id']
             yield scrapy.Request(url, callback=self.parse_item_detail)
-            break
+
 
     def parse_item_detail(self,response):
         self.log(response.url)
@@ -123,7 +123,11 @@ class TrustSxxtSpider(scrapy.Spider):
         item['fee_manage'] = tds[1].text.strip().replace("--", "")
         item['fee_pay'] = tds[3].text.strip().replace("--", "")
         item['type_name'] = "CTA策略|股票对冲|组合基金|全球宏观|债券策略"
+
         item['entry_time'] = GetNowTime()
+        item['data_source'] = 6
+        item['data_source_name'] = '期货资管网'
+
         item['uuid'] = hashlib.md5((item['fund_name'] + item['fund_id']).encode('utf8')).hexdigest()
         print item
         yield item
