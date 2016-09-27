@@ -52,27 +52,25 @@ class TrustSxxtSpider(scrapy.Spider):
             }
             yield scrapy.FormRequest(response.url, formdata=data, callback=self.parse_item, dont_filter=True)
 
-
     def parse_item(self, response):
         print response.url
         t = json.loads(response.body)
         datas = t['rawdata']['data']
         for data in datas:
             url = "http://www.ziguan123.com/product/detail/" + data['id']
-            yield scrapy.Request(url, callback=self.parse_item_detail)
+            yield scrapy.Request(url, callback=self.parse_detail)
 
-
-    def parse_item_detail(self,response):
-        self.log(response.url)
-        soup = BeautifulSoup(response.body, "lxml")
-        trs = soup.find_all("td", align="left")
-        if len(trs) > 0:
-            for tr in trs:
-                urll = "http://www.ziguan123.com" + tr.a['href']
-                yield scrapy.Request(urll, callback=self.parse_detail,dont_filter=True)
-
-        else:
-            yield scrapy.Request(response.url, callback=self.parse_detail, dont_filter=True)
+    # def parse_item_detail(self,response):
+    #     self.log(response.url)
+    #     soup = BeautifulSoup(response.body, "lxml")
+    #     trs = soup.find_all("td", align="left")
+    #     # if len(trs) > 0:
+    #     #     for tr in trs:
+    #     #         urll = "http://www.ziguan123.com" + tr.a['href']
+    #     #         yield scrapy.Request(urll, callback=self.parse_detail,dont_filter=True)
+    #     #
+    #     # else:
+    #     yield scrapy.Request(response.url, callback=self.parse_detail, dont_filter=True)
 
 
     def parse_detail(self, response):
@@ -82,6 +80,7 @@ class TrustSxxtSpider(scrapy.Spider):
         title = soup.find("h1", {"class": "cp-title"})
         if title:
             num = response.url.replace("http://www.ziguan123.com/product/detail/", "")
+            item['user_id'] = num
         rs = soup.find("table", {"class": "tablebor_xy table_td_w25p "})
         trs = rs.find_all("tr")
         tds = trs[1].find_all("td")
@@ -92,16 +91,10 @@ class TrustSxxtSpider(scrapy.Spider):
             item['resume'] = "None"
         if len(d.text.strip().split()) == 2:
             item['resume'] = d.text.strip().split()[1]
-        item['user_name'] = tds[3].text.strip().replace('--', '')
-        if len(item['user_name']) == 0:
-            return
-
-        item['user_id'] = num
+        if tds[3].text.strip() != "--":
+            item['user_name'] = tds[3].text.strip()
 
         item['entry_time'] = GetNowTime()
-        item['data_source'] = 6
-        item['data_source_name'] = '期货资管网'
-
         item['uuid'] = hashlib.md5((item['user_name']).encode('utf8')).hexdigest()
         print item
         yield item
