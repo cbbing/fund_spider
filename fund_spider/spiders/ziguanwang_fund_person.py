@@ -102,7 +102,7 @@ class TrustSxxtSpider(scrapy.Spider):
         item['data_source'] = 6
         item['data_source_name'] = '期货资管网'
 
-        item['uuid'] = hashlib.md5((item['user_name'] + item['user_id']).encode('utf8')).hexdigest()
+        item['uuid'] = hashlib.md5((item['user_name']).encode('utf8')).hexdigest()
         print item
         yield item
 
