@@ -18,7 +18,6 @@ class TrustSxxtSpider(scrapy.Spider):
         'http://www.wxtrust.com/c55ef089-7d41-4e6c-8439-e5694694365e/index.html',
     )
 
-
     def parse(self, response):
         self.log(response.url)
         # 请求第一页
@@ -26,23 +25,21 @@ class TrustSxxtSpider(scrapy.Spider):
         soup = BeautifulSoup(response.body, "lxml")
         trs = soup.find('span', id="PageSpan").find_all("a")
         t = trs[1]['href']
-        ts=filter(str.isdigit, t)
-        for i in range(1,int(ts)+1):
-            url = "http://www.wxtrust.com/c55ef089-7d41-4e6c-8439-e5694694365e/index_%d.html"%i
+        ts = filter(str.isdigit, t)
+        for i in range(1, int(ts) + 1):
+            url = "http://www.wxtrust.com/c55ef089-7d41-4e6c-8439-e5694694365e/index_%d.html" % i
             yield scrapy.Request(url, callback=self.parse_two)
 
-    def parse_two(self,response):
+    def parse_two(self, response):
         self.log(response.url)
         soup = BeautifulSoup(response.body, "lxml")
         trs = soup.find_all('dl')
         for tr in trs:
-            years=tr.dd.text.replace("-", "")[0:4]
-            urls="http://www.wxtrust.com/c55ef089-7d41-4e6c-8439-e5694694365e/info/"+years+"/"
-            idd=tr['id'].replace("vh_","")
-            urll=urls+idd+".html"
+            years = tr.dd.text.replace("-", "")[0:4]
+            urls = "http://www.wxtrust.com/c55ef089-7d41-4e6c-8439-e5694694365e/info/" + years + "/"
+            idd = tr['id'].replace("vh_", "")
+            urll = urls + idd + ".html"
             yield scrapy.Request(urll, callback=self.parse_history_nav)
-
-
 
     def parse_history_nav(self, response):
         """
@@ -53,16 +50,16 @@ class TrustSxxtSpider(scrapy.Spider):
         """
         self.log(response.url)
         soup = BeautifulSoup(response.body, "lxml")
-        divs= soup.find('div',{"class":"right_title"})
-        trs = soup.find_all('tr')
+        trs = soup.find('div', {"class": "right_about"}).find_all("tr")
         for tr in trs:
             tds = tr.find_all('td')
-            if len(tds)==4:
+            if tds:
                 item = FundSpiderItem()
-                item['fund_name'] = divs.text.strip().encode("ISO-8859-1").replace("\r\n\t净值报告","")
-                item['fund_full_name'] =item['fund_name']
+                item['fund_name'] = soup.find("div", {"class": "right_title"}).text.strip().replace("净值报告", "").replace(
+                    "\r\n\t", "")
+                item['fund_full_name'] = item['fund_name']
                 item['nav'] = tds[1].text.strip()
-                item['added_nav']=tds[2].text.strip()
+                item['added_nav'] = tds[2].text.strip()
                 item['statistic_date'] = tds[0].text.strip()
                 item['entry_time'] = GetNowTime()
                 item['source_code'] = 1
