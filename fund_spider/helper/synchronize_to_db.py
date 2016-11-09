@@ -23,7 +23,7 @@ redis_key_syn_dict = "fund_syn_to_fof_uuids"
 
 def synchronize_to_db():
 
-    for i in range(1, 70):
+    for i in range(61, 70):
         org_id = 'TG000{}'.format(i) if i < 10 else 'TG00{}'.format(i)
 
         # 源数据
@@ -36,29 +36,42 @@ def synchronize_to_db():
             if len(df_origin) == 0:
                 continue
 
-            uuids = df_origin['uuid'].get_values()
-
-            print org_id, 'before len', len(df_origin)
-            df = df_origin[df_origin['uuid'].apply(lambda x: not redis_db4.hexists(redis_key_syn_dict, x))]
-            print org_id,  'after len', len(df)
-            # del df['uuid']
-            print df.head(1)
-            # print df.columns
-
             print org_id, 'save to db begin...'
-            df.to_sql("t_fund_nv_data", engine_obj, if_exists='append', index=False)
-            print org_id, 'save to db finish...'
+            for ix, row in df_origin.iterrows():
+                try:
+                    df_origin[ix:ix+1].to_sql("t_fund_nv_data", engine_obj, if_exists='append', index=False)
+                    print row['uuid']
+                except Exception,e:
+                    print "{} exists".format(row['uuid'])
 
-            print org_id,  'update status to redis begin...'
-            for uuid in uuids:
-                redis_db4.hset(redis_key_syn_dict, uuid, 0)
-            print org_id, 'update status to redis finish...'
-
-            print org_id,  'update status begin...'
-            for uuid in uuids:
-                sql_u = "update classifier_db.t_fund_nv_data set syn_status=1 where uuid='{}' ".format(uuid)
+                sql_u = "update classifier_db.t_fund_nv_data set syn_status=1 where uuid='{}' ".format(row['uuid'])
                 engine_src.execute(sql_u)
-            print org_id, 'update status finished'
+
+            print org_id, 'save to db end...'
+
+            # uuids = df_origin['uuid'].get_values()
+            #
+            # print org_id, 'before len', len(df_origin)
+            # df = df_origin[df_origin['uuid'].apply(lambda x: not redis_db4.hexists(redis_key_syn_dict, x))]
+            # print org_id,  'after len', len(df)
+            # # del df['uuid']
+            # print df.head(1)
+            # # print df.columns
+            #
+            # print org_id, 'save to db begin...'
+            # df.to_sql("t_fund_nv_data", engine_obj, if_exists='append', index=False)
+            # print org_id, 'save to db finish...'
+            #
+            # print org_id,  'update status to redis begin...'
+            # for uuid in uuids:
+            #     redis_db4.hset(redis_key_syn_dict, uuid, 0)
+            # print org_id, 'update status to redis finish...'
+            #
+            # print org_id,  'update status begin...'
+            # for uuid in uuids:
+            #     sql_u = "update classifier_db.t_fund_nv_data set syn_status=1 where uuid='{}' ".format(uuid)
+            #     engine_src.execute(sql_u)
+            # print org_id, 'update status finished'
 
         print 'syn {} finished! sleep 3 seconds'.format(org_id)
         time.sleep(3)
