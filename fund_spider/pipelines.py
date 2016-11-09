@@ -179,7 +179,7 @@ class MySQLStorePipeline(object):
         table = table_dict.get(type(item))
 
         df = pd.DataFrame([item])
-        print df
+        # print df
         try:
             df.to_sql(table, engine, if_exists='append', index=False)
             # redis_db4.hset(redis_fund_dict, item['uuid'], item['org_id'])

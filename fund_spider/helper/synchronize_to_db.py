@@ -23,7 +23,7 @@ redis_key_syn_dict = "fund_syn_to_fof_uuids"
 
 def synchronize_to_db():
 
-    for i in range(61, 70):
+    for i in range(1, 70):
         org_id = 'TG000{}'.format(i) if i < 10 else 'TG00{}'.format(i)
 
         # 源数据
